@@ -6,6 +6,7 @@ import excel_rw as erw
 import csv
 import openpyxl
 import string
+import os
 
 input_csv_path: string  # path to csv file
 input_excel_path: string    # path to original spreadsheet
@@ -30,5 +31,8 @@ print('\nNext, enter the path to your current cost-tracking spreadsheet.')
 while True:
     input_excel_path = input(f'Path to Excel spreadsheet: ')
     # input_excel =
+
+output_excel_path = os.path.basename(input_excel_path)
+
 
 
