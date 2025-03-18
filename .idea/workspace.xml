@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af9688fa-ea38-448e-a52c-fe5dc7bf45cc" name="Changes" comment="oops teehee">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/excel_rw.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/excel_rw.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/main.py" afterDir="false" />
-    </list>
+    <list default="true" id="af9688fa-ea38-448e-a52c-fe5dc7bf45cc" name="Changes" comment="some input validation" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -181,7 +177,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742247744099</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="some input validation">
+      <option name="closed" value="true" />
+      <created>1742249003846</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1742249003846</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -209,6 +213,7 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="initial commit" />
     <MESSAGE value="oops teehee" />
-    <option name="LAST_COMMIT_MESSAGE" value="oops teehee" />
+    <MESSAGE value="some input validation" />
+    <option name="LAST_COMMIT_MESSAGE" value="some input validation" />
   </component>
 </project>
