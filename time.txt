@@ -1,2 +1,2 @@
-time worked: 2h
+time worked: 3h
 time recorded: 0h

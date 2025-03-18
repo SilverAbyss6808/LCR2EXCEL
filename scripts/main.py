@@ -22,7 +22,7 @@ print(
 print('\nTo begin, enter the path to your Labor Cost Report .csv file.')
 while True:
     input_csv_path = input(f'Path to csv file: ')
-    input_csv = erw.read_input_csv(input_csv_path)
+    input_csv = erw.read_input_file(input_csv_path, '.csv')
     if input_csv:
         break
 
@@ -30,9 +30,26 @@ while True:
 print('\nNext, enter the path to your current cost-tracking spreadsheet.')
 while True:
     input_excel_path = input(f'Path to Excel spreadsheet: ')
-    # input_excel =
+    input_excel = erw.read_input_file(input_excel_path, '.xlsx')
+    if input_excel:
+        break
 
-output_excel_path = os.path.basename(input_excel_path)
+# print proposed output file and path
+# output_excel_path = f'{input_excel_path}-MODIFIED'
+output_excel_path = f''
 
+while True:
+    confirm = input(f'\nProposed output file {output_excel_path}. Is this okay? [y/n] ')
+    confirm = confirm.lower()
+    if confirm == 'y':
+        print(f'Proceeding to file processing...')
+        break
+    elif confirm == 'n':
+        new_path: string = input(f'Enter proposed path: ')
+        validate_path = erw.validate_filepath(new_path, '.xlsx')
+        if validate_path:
+            output_excel_path = new_path
+            print(f'Path {output_excel_path} is valid. Proceeding to file processing...')
+            break
 
 
