@@ -36,7 +36,8 @@ while True:
 
 # print proposed output file and path
 # output_excel_path = f'{input_excel_path}-MODIFIED'
-output_excel_path = f''
+split_ext = os.path.splitext(input_excel_path)
+output_excel_path = f'{split_ext[0]}-MODIFIED{split_ext[1]}'
 
 while True:
     confirm = input(f'\nProposed output file {output_excel_path}. Is this okay? [y/n] ')

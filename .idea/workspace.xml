@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af9688fa-ea38-448e-a52c-fe5dc7bf45cc" name="Changes" comment="add file to track time worked">
+    <list default="true" id="af9688fa-ea38-448e-a52c-fe5dc7bf45cc" name="Changes" comment="more input validation n such">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/excel_rw.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/excel_rw.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -93,7 +92,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742261797939</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="more input validation n such">
+      <option name="closed" value="true" />
+      <created>1742318007101</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1742318007101</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -123,6 +130,7 @@
     <MESSAGE value="oops teehee" />
     <MESSAGE value="some input validation" />
     <MESSAGE value="add file to track time worked" />
-    <option name="LAST_COMMIT_MESSAGE" value="add file to track time worked" />
+    <MESSAGE value="more input validation n such" />
+    <option name="LAST_COMMIT_MESSAGE" value="more input validation n such" />
   </component>
 </project>

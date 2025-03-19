@@ -49,7 +49,6 @@ def validate_filepath(path: string, filetype: string):
     directory = os.path.dirname(path)
     if directory is not None:
         if not os.path.isfile(path):
-            print(f'File will be created at {path}.')
             return True
         else:
             print('Directory is valid, but file already exists. Please enter a path with a new filename.')
