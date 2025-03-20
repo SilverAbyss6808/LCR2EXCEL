@@ -5,7 +5,7 @@
 # this file is gonna be just for excel sheet interactions
 
 
-import openpyxl
+import openpyxl as opxl
 import string
 import csv
 import os
@@ -22,12 +22,12 @@ def read_input_file(path: string, filetype: string):
             raise TypeError(f'not a {filetype} file')
 
         if filetype == '.csv':
-            print(f'{type}')
+            pass
             # file_in = open(path, 'r')
             # reader = csv.reader(file_in)
             # TODO: add to external variable to allow access later??
         elif filetype == '.xlsx':
-            print(f'{type}')
+            pass
         else:
             raise TypeError(f'not a file of type .csv or .xlsx')
 

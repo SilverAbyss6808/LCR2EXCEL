@@ -4,9 +4,11 @@
 import data_processing as dp
 import excel_rw as erw
 import csv
-import openpyxl
+import openpyxl as opxl
 import string
 import os
+
+from scripts.data_processing import process_data
 
 input_csv_path: string  # path to csv file
 input_excel_path: string    # path to original spreadsheet
@@ -53,4 +55,4 @@ while True:
             print(f'Path {output_excel_path} is valid. Proceeding to file processing...')
             break
 
-
+dp.process_data(input_csv_path, input_excel_path, output_excel_path)
