@@ -1,2 +1,5 @@
-time worked: 4h
+time worked: 6h
 time recorded: 0h
+
+pre-03/21   5
+03/21       1

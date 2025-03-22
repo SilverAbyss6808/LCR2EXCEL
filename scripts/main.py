@@ -2,15 +2,14 @@
 # this is gonna be the script that actually runs the program
 
 import data_processing as dp
-import excel_rw as erw
-import csv
+import file_rw as frw
 import openpyxl as opxl
 import string
 import os
 
 from scripts.data_processing import process_data
 
-input_csv_path: string  # path to csv file
+input_pdf_path: string  # path to pdf file
 input_excel_path: string    # path to original spreadsheet
 output_excel_path: string   # path to output spreadsheet: should be in the same directory as the input
 
@@ -20,19 +19,19 @@ print(
     f'###############################################'
 )
 
-# take csv path as input and make sure it exists
-print('\nTo begin, enter the path to your Labor Cost Report .csv file.')
+# take pdf path as input and make sure it exists
+print('\nTo begin, enter the path to your Labor Cost Report .pdf file.')
 while True:
-    input_csv_path = input(f'Path to csv file: ')
-    input_csv = erw.read_input_file(input_csv_path, '.csv')
-    if input_csv:
+    input_pdf_path = input(f'Path to pdf file: ')
+    input_pdf = frw.read_input_file(input_pdf_path, '.pdf')
+    if input_pdf:
         break
 
 # take and verify input excel path
 print('\nNext, enter the path to your current cost-tracking spreadsheet.')
 while True:
     input_excel_path = input(f'Path to Excel spreadsheet: ')
-    input_excel = erw.read_input_file(input_excel_path, '.xlsx')
+    input_excel = frw.read_input_file(input_excel_path, '.xlsx')
     if input_excel:
         break
 
@@ -49,10 +48,11 @@ while True:
         break
     elif confirm == 'n':
         new_path: string = input(f'Enter proposed path: ')
-        validate_path = erw.validate_filepath(new_path, '.xlsx')
+        new_type = os.path.splitext(new_path)[1]
+        validate_path = frw.validate_filepath(new_path, new_type)
         if validate_path:
             output_excel_path = new_path
             print(f'Path {output_excel_path} is valid. Proceeding to file processing...')
             break
 
-dp.process_data(input_csv_path, input_excel_path, output_excel_path)
+dp.process_data(input_pdf_path, input_excel_path, output_excel_path)
