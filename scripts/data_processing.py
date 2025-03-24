@@ -13,6 +13,10 @@ class Job:
         self.est = est
         self.act = act
 
+    def __str__(self):
+        return (f'Job Number: {self.jnum}, Project Manager: {self.pm}, Description: {self.desc}\n'
+                f'Estimated Cost: {self.est}, Actual Cost: {self.act}\n')
+
 
 class JobRow:
     def __init__(self, column1, jobno, description, column2, pm, column5):
@@ -55,10 +59,8 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
     jnum: string = 'DEFAULT'
     desc: string = 'DEFAULT'
     pm: string = 'DEFAULT'
-    # est: int = 99999999
-    # act: int = 99999999
-    est: string = 'DEFAULT'
-    act: string = 'DEFAULT'
+    est: int = 99999999
+    act: int = 99999999
 
     cc = False
 
@@ -72,34 +74,27 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
         elif 'Est Actual Remaining' in line:
             pm = line.split(' ')[0]
         elif 'Job Totals' in line and 'Primary' not in line:
-            # todo: split em right heehooooooo
-
             line_nospaces = line.replace(' ', '')
 
-            # est = line.split(' ')[4]
-            # act = line.split(' ')[5]
+            est_str = line_nospaces.split('*')[3]
+            act_str = line_nospaces.split('*')[4]
 
-            est = line_nospaces.split('*')[3]
-            act = line_nospaces.split('*')[4]
-        else:
-            continue
+            # cast to int for excel
+            est = int(est_str.replace(',', ''))
+            act = int(act_str.replace(',', ''))
 
-        if jnum != 'DEFAULT' and desc != 'DEFAULT' and pm != 'DEFAULT' and est != 'DEFAULT' and act != 'DEFAULT':
+        if jnum != 'DEFAULT' and desc != 'DEFAULT' and pm != 'DEFAULT' and est != 99999999 and act != 99999999:
             # add job to list and reset variables
             jobs.append(Job(jnum, desc, pm, est, act))
 
             jnum = 'DEFAULT'
             desc = 'DEFAULT'
             pm = 'DEFAULT'
-            est = 'DEFAULT'
-            act = 'DEFAULT'
+            est = 99999999
+            act = 99999999
 
     # reports if there's a discrepancy found so the data can be reviewed
     if len(jobs) != num_jobs:
         print(f'Though {num_jobs} were found, {len(jobs)} were actually reported. You may want to check your data.')
 
     return jobs
-
-# process_data('..\\io\\testfile.pdf',
-#              '..\\io\\Labor Tracking Spreadsheet 2024.xlsx',
-#              '..\\io\\Labor Tracking Spreadsheet 2024-MODIFIED.xlsx')

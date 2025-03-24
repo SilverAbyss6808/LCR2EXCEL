@@ -49,10 +49,14 @@ while True:
     elif confirm == 'n':
         new_path: string = input(f'Enter proposed path: ')
         new_type = os.path.splitext(new_path)[1]
-        validate_path = frw.validate_filepath(new_path, new_type)
+        validate_path = frw.validate_proposed_filepath(new_path, new_type)
         if validate_path:
             output_excel_path = new_path
             print(f'Path {output_excel_path} is valid. Proceeding to file processing...')
             break
 
-dp.process_data(input_pdf_path, input_excel_path, output_excel_path)
+# process data !!
+jobs_from_pdf = frw.read_pdf(input_pdf_path)  # returns the relevant info from the pdf
+
+for job in jobs_from_pdf:
+    print(str(job))

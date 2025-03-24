@@ -17,13 +17,13 @@ def read_input_file(path: string, filetype: string):
         if os.path.splitext(path)[1] != filetype:
             raise TypeError(f'not a {filetype} file')
 
-        # todo: verify that input files exist !!!
-        if filetype == '.pdf':
-            read_pdf(path)
-        elif filetype == '.xlsx':
-            pass
+        if os.path.exists(path):
+            if filetype == '.pdf':
+                read_pdf(path)
+            elif filetype == '.xlsx':
+                pass
         else:
-            raise TypeError(f'not a file of type .pdf or .xlsx')
+            raise FileNotFoundError(f'File {path} does not exist. Please try again.')
 
         return True  # returns True if the file exists
 
@@ -39,7 +39,7 @@ def read_input_file(path: string, filetype: string):
     return False  # only executes if an error occurs
 
 
-def validate_filepath(path: string, filetype: string):
+def validate_proposed_filepath(path: string, filetype: string):
     directory = os.path.dirname(path)
     if directory is not None:
         if not os.path.isfile(path):
@@ -62,12 +62,6 @@ def read_pdf(path: string):
     pages = reader.pages
     for page in pages:
         data += page.extract_text()
-        print(page.extract_text())
 
     jobs_list: list[dp.Job] = dp.format_pdf_data_as_job(data)
     return jobs_list
-
-
-jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
-for job in jobs:
-    print(f'JobNum: {job.jnum}, Desc: {job.desc}, PM: {job.pm}, Est: {job.est}, Act: {job.act}')
