@@ -5,31 +5,10 @@ import openpyxl as opxl
 import pypdf
 import string
 import os
+import data_processing as dp
 
 
 pdf_data: string
-
-
-class Job:
-    def __init__(self, jnum: string, desc: string, pm: string, est: int, act: int):
-        self.jnum = jnum
-        self.desc = desc
-        self.pm = pm
-        self.est = est
-        self.act = act
-
-
-class JobRow:
-    def __init__(self, column1, jobno, description, column2, pm, column5):
-        self.column1 = column1
-        self.jobno = jobno
-        self.description = description
-        self.column2 = column2
-        self.pm = pm
-        self.column5 = column5
-
-    def compare_jobs(self):
-        pass
 
 
 def read_input_file(path: string, filetype: string):
@@ -78,15 +57,18 @@ def validate_filepath(path: string, filetype: string):
 def read_pdf(path: string):
     # path has already been verified so its ok
     data: string = ''
-    jobs: JobRow[]:
-        pass
+    jobs: list[dp.Job]
 
     reader = pypdf.PdfReader(path)
     pages = reader.pages
     for page in pages:
         data += page.extract_text()
-    interpret_pdf_data(data)
-    return data
+        print(page.extract_text())
+
+    jobs = dp.format_pdf_data_as_job(data)
+    return jobs
 
 
-def interpret_pdf_data(data: string):
+jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
+for job in jobs:
+    print(f'JobNum: {job.jnum}, Desc: {job.desc}, PM: {job.pm}, Est: {job.est}, Act: {job.act}')
