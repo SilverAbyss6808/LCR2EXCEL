@@ -57,7 +57,6 @@ def validate_filepath(path: string, filetype: string):
 def read_pdf(path: string):
     # path has already been verified so its ok
     data: string = ''
-    jobs: list[dp.Job]
 
     reader = pypdf.PdfReader(path)
     pages = reader.pages
@@ -65,8 +64,8 @@ def read_pdf(path: string):
         data += page.extract_text()
         print(page.extract_text())
 
-    jobs = dp.format_pdf_data_as_job(data)
-    return jobs
+    jobs_list: list[dp.Job] = dp.format_pdf_data_as_job(data)
+    return jobs_list
 
 
 jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')

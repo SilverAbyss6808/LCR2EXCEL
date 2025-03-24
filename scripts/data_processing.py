@@ -1,4 +1,3 @@
-
 # this is where the stuff for processing the input pdf is gonna go
 # plus any other data processing things
 
@@ -52,44 +51,54 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
     # create jobs from split string data
     jobs: list[Job] = []
 
-    # create individual jobs from string data
-    for i in range(0, num_jobs):
-        # setting some recognizable defaults so i know if somethings wrong
-        jnum: string = 'DEFAULT'
-        desc: string = 'DEFAULT'
-        pm: string = 'DEFAULT'
-        # est: int = 99999999
-        # act: int = 99999999
-        est: string = 'DEFAULT'
-        act: string = 'DEFAULT'
+    # setting some recognizable defaults so i know if somethings wrong
+    jnum: string = 'DEFAULT'
+    desc: string = 'DEFAULT'
+    pm: string = 'DEFAULT'
+    # est: int = 99999999
+    # act: int = 99999999
+    est: string = 'DEFAULT'
+    act: string = 'DEFAULT'
 
-        cc = False
+    cc = False
 
-        # todo: start here next. figure out how to successfully remove line from data
-        for line in data:
-            if 'Cost Code' in line:
-                cc = True
-                break
-                # print('cost code in line')
-            if cc:
-                jnum = line.split(' ')[0]
-                desc = line
-                cc = False
-                print('jnum and desc set')
-            if 'Est Actual Remaining' in line:
-                pm = line.split(' ')[0]
-                print('pm set')
-            if 'Job Totals' in line:
-                est = line.split(' ')[4]
-                act = line.split(' ')[5]
-                print('est/act set')
-                break
+    for line in data:
+        if line == 'Cost Code Description':
+            cc = True
+        elif cc:
+            jnum = line.split(' ')[0]
+            desc = line.replace(jnum + ' ', '')
+            cc = False
+        elif 'Est Actual Remaining' in line:
+            pm = line.split(' ')[0]
+        elif 'Job Totals' in line and 'Primary' not in line:
+            # todo: split em right heehooooooo
 
-        jobs.append(Job(jnum, desc, pm, est, act))
+            line_nospaces = line.replace(' ', '')
 
-    print(f'{len(jobs)}/{num_jobs} jobs total.')
+            # est = line.split(' ')[4]
+            # act = line.split(' ')[5]
+
+            est = line_nospaces.split('*')[3]
+            act = line_nospaces.split('*')[4]
+        else:
+            continue
+
+        if jnum != 'DEFAULT' and desc != 'DEFAULT' and pm != 'DEFAULT' and est != 'DEFAULT' and act != 'DEFAULT':
+            # add job to list and reset variables
+            jobs.append(Job(jnum, desc, pm, est, act))
+
+            jnum = 'DEFAULT'
+            desc = 'DEFAULT'
+            pm = 'DEFAULT'
+            est = 'DEFAULT'
+            act = 'DEFAULT'
+
+    # reports if there's a discrepancy found so the data can be reviewed
+    if len(jobs) != num_jobs:
+        print(f'Though {num_jobs} were found, {len(jobs)} were actually reported. You may want to check your data.')
+
     return jobs
-
 
 # process_data('..\\io\\testfile.pdf',
 #              '..\\io\\Labor Tracking Spreadsheet 2024.xlsx',
