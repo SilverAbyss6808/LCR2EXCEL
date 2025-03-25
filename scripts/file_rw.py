@@ -65,3 +65,38 @@ def read_pdf(path: string):
 
     jobs_list: list[dp.Job] = dp.format_pdf_data_as_job(data)
     return jobs_list
+
+
+def read_excel(input_excel_path: string):
+    orig_jobs: list[string] = []
+
+    workbook = opxl.load_workbook(input_excel_path)
+    active_sheet = workbook.active
+
+    rows: list = list(active_sheet.iter_rows(min_row=2, max_col=4, values_only=True))
+    num_rows = active_sheet.max_row - 13  # starting from line 2, running until 12 lines from end cuz those aren't part of jobs
+    num_jobs: int = int(num_rows / 4)  # number of lines minus title line, divided by four lines per job
+
+    for i in range(0, num_rows, 4):  # i is the index jsyk
+        current_row = (rows[i])
+        orig_jobs.append(current_row)
+
+    orig_jobs = dp.create_jobs_from_excel_in(orig_jobs)
+    return orig_jobs
+
+
+
+# uncomment for test
+# both return lists of jobs !!! with relevant info !!!!!
+# except for the stuff from the original excel, those dont have costs, those will be edited when the two are merged
+new_jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
+orig_jobs = read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
+
+for job in new_jobs:
+    print(f'NEW JOB: {str(job)}')
+
+for job in orig_jobs:
+    print(f'OLD JOB: {str(job)}')
+
+print(f'Number of new jobs: {len(new_jobs)}\n'
+      f'Number of preexisting jobs: {len(orig_jobs)}')

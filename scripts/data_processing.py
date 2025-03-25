@@ -6,7 +6,13 @@ import string
 
 
 class Job:
-    def __init__(self, jnum: string, desc: string, pm: string, est: int, act: int):
+    jnum: int  # will need to cast to string with - for excel sheet (XX-XX-XXXX)
+    desc: string
+    pm: string
+    est: int
+    act: int
+
+    def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int):
         self.jnum = jnum
         self.desc = desc
         self.pm = pm
@@ -31,11 +37,6 @@ class JobRow:
         pass
 
 
-def process_data(input_pdf_path: string, input_excel_path: string, output_file_path: string):
-    workbook = opxl.load_workbook(input_excel_path)
-    active_sheet = workbook.active
-
-
 def format_pdf_data_as_job(data: string):  # return an array of jobs
     num_jobs: int = 0
     data_lines = data.split('\n')
@@ -56,7 +57,7 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
     jobs: list[Job] = []
 
     # setting some recognizable defaults so i know if somethings wrong
-    jnum: string = 'DEFAULT'
+    jnum: int = 99999999
     desc: string = 'DEFAULT'
     pm: string = 'DEFAULT'
     est: int = 99999999
@@ -68,8 +69,10 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
         if line == 'Cost Code Description':
             cc = True
         elif cc:
-            jnum = line.split(' ')[0]
-            desc = line.replace(jnum + ' ', '')
+            jnum_string = line.split(' ')[0]
+            jnum = int(jnum_string.replace('-', ''))
+
+            desc = line.replace(jnum_string + ' ', '')
             cc = False
         elif 'Est Actual Remaining' in line:
             pm = line.split(' ')[0]
@@ -87,7 +90,7 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
             # add job to list and reset variables
             jobs.append(Job(jnum, desc, pm, est, act))
 
-            jnum = 'DEFAULT'
+            jnum = 99999999
             desc = 'DEFAULT'
             pm = 'DEFAULT'
             est = 99999999
@@ -98,3 +101,14 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
         print(f'Though {num_jobs} were found, {len(jobs)} were actually reported. You may want to check your data.')
 
     return jobs
+
+
+def create_jobs_from_excel_in(data: list[string]):
+    orig_job_list_excel: list[Job] = []
+    for job in data:
+        jnum = int(str(job[0]).replace('-',''))
+        desc = job[2]
+        pm = job[3]
+        orig_job_list_excel.append(Job(jnum, desc, pm, est=0, act=0))
+
+    return orig_job_list_excel
