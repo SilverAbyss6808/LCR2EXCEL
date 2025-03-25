@@ -24,19 +24,6 @@ class Job:
                 f'Estimated Cost: {self.est}, Actual Cost: {self.act}\n')
 
 
-class JobRow:
-    def __init__(self, column1, jobno, description, column2, pm, column5):
-        self.column1 = column1
-        self.jobno = jobno
-        self.description = description
-        self.column2 = column2
-        self.pm = pm
-        self.column5 = column5
-
-    def compare_jobs(self):
-        pass
-
-
 def format_pdf_data_as_job(data: string):  # return an array of jobs
     num_jobs: int = 0
     data_lines = data.split('\n')
@@ -106,9 +93,31 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 def create_jobs_from_excel_in(data: list[string]):
     orig_job_list_excel: list[Job] = []
     for job in data:
-        jnum = int(str(job[0]).replace('-',''))
+        jnum = int(str(job[0]).replace('-', ''))
         desc = job[2]
         pm = job[3]
         orig_job_list_excel.append(Job(jnum, desc, pm, est=0, act=0))
 
     return orig_job_list_excel
+
+
+def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both lists are sorted already
+    combined_list: list[Job] = []
+
+    same_jobs: bool = False
+    nj_greater: bool = False
+    oj_greater: bool = False
+
+    for oj in old_jobs:
+        for nj in new_jobs:
+            # find biggest jnum to append to end of combined list
+            if nj.jnum == oj.jnum:
+                combined_list.append(Job(oj.jnum, oj.desc, oj.pm, nj.est, nj.act))
+            elif nj.jnum > oj.jnum:
+                combined_list.append(Job(nj.jnum, nj.desc, nj.pm, nj.est, nj.act))
+            else:
+                combined_list.append(Job(oj.jnum, oj.desc, oj.pm, oj.est, oj.act))
+
+            break
+
+    return combined_list

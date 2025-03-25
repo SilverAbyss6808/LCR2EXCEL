@@ -68,22 +68,27 @@ def read_pdf(path: string):
 
 
 def read_excel(input_excel_path: string):
-    orig_jobs: list[string] = []
+    excel_jobs: list[string] = []
 
     workbook = opxl.load_workbook(input_excel_path)
     active_sheet = workbook.active
 
     rows: list = list(active_sheet.iter_rows(min_row=2, max_col=4, values_only=True))
-    num_rows = active_sheet.max_row - 13  # starting from line 2, running until 12 lines from end cuz those aren't part of jobs
+    num_rows = active_sheet.max_row - 13  # starting from line 2, run until 12 lines from end cuz those aren't jobs
     num_jobs: int = int(num_rows / 4)  # number of lines minus title line, divided by four lines per job
 
     for i in range(0, num_rows, 4):  # i is the index jsyk
         current_row = (rows[i])
-        orig_jobs.append(current_row)
+        excel_jobs.append(current_row)
 
-    orig_jobs = dp.create_jobs_from_excel_in(orig_jobs)
-    return orig_jobs
+    excel_jobs = dp.create_jobs_from_excel_in(excel_jobs)
+    return excel_jobs
 
+
+def write_new_excel(new: list[dp.Job], old: list[dp.Job]):
+    job_list = dp.compare_jobs(new, old)
+    for i in job_list:
+        print(str(i))
 
 
 # uncomment for test
@@ -99,4 +104,7 @@ for job in orig_jobs:
     print(f'OLD JOB: {str(job)}')
 
 print(f'Number of new jobs: {len(new_jobs)}\n'
-      f'Number of preexisting jobs: {len(orig_jobs)}')
+      f'Number of preexisting jobs: {len(orig_jobs)}'
+      f'Number of combined jobs: ')
+
+write_new_excel(new_jobs, orig_jobs)

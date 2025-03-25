@@ -7,8 +7,6 @@ import openpyxl as opxl
 import string
 import os
 
-from scripts.data_processing import process_data
-
 input_pdf_path: string  # path to pdf file
 input_excel_path: string    # path to original spreadsheet
 output_excel_path: string   # path to output spreadsheet: should be in the same directory as the input
@@ -57,6 +55,4 @@ while True:
 
 # process data !!
 jobs_from_pdf = frw.read_pdf(input_pdf_path)  # returns the relevant info from the pdf
-
-for job in jobs_from_pdf:
-    print(str(job))
+jobs_from_excel = frw.read_excel(input_excel_path)
