@@ -121,3 +121,8 @@ def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both
                 old_idx += 1
 
     return combined_list
+
+
+def format_jobs_as_excel(list: list[Job]):
+    # todo: get old costs from excel. dipshit
+    pass

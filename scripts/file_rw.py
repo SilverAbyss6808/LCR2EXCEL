@@ -86,29 +86,29 @@ def read_excel(input_excel_path: string):
     return excel_jobs
 
 
-def write_new_excel(new: list[dp.Job], old: list[dp.Job]):
-    job_list = dp.compare_jobs(new, old)
+def write_new_excel(new: list[dp.Job], old: list[dp.Job], path: string = ''):
     # todo: actually format data and write it to the excel sheet
-    return job_list
+    job_list = dp.compare_jobs(new, old)
+    dp.format_jobs(job_list)
 
 
-# uncomment for test
-# both return lists of jobs !!! with relevant info !!!!!
-# except for the stuff from the original excel, those dont have costs, those will be edited when the two are merged
-new_jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
-orig_jobs = read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
-
-# for job in new_jobs:
-#     print(f'NEW JOB: {str(job)}')
+# # uncomment for test
+# # both return lists of jobs !!! with relevant info !!!!!
+# # except for the stuff from the original excel, those dont have costs, those will be edited when the two are merged
+# new_jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
+# orig_jobs = read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
 #
-# for job in orig_jobs:
-#     print(f'OLD JOB: {str(job)}')
-
-combined_jobs = write_new_excel(new_jobs, orig_jobs)
-
-for job in combined_jobs:
-    print(str(job.jnum))
-
-print(f'Number of new jobs: {len(new_jobs)}\n'
-      f'Number of preexisting jobs: {len(orig_jobs)}\n'
-      f'Number of combined jobs: {len(combined_jobs)}')
+# # for job in new_jobs:
+# #     print(f'NEW JOB: {str(job)}')
+# #
+# # for job in orig_jobs:
+# #     print(f'OLD JOB: {str(job)}')
+#
+# combined_jobs = write_new_excel(new_jobs, orig_jobs)
+#
+# for job in combined_jobs:
+#     print(str(job.jnum))
+#
+# print(f'Number of new jobs: {len(new_jobs)}\n'
+#       f'Number of preexisting jobs: {len(orig_jobs)}\n'
+#       f'Number of combined jobs: {len(combined_jobs)}')
