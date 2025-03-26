@@ -104,20 +104,20 @@ def create_jobs_from_excel_in(data: list[string]):
 def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both lists are sorted already
     combined_list: list[Job] = []
 
-    same_jobs: bool = False
-    nj_greater: bool = False
-    oj_greater: bool = False
+    old_idx = 0
+    old_max = len(old_jobs)
 
-    for oj in old_jobs:
-        for nj in new_jobs:
-            # find biggest jnum to append to end of combined list
-            if nj.jnum == oj.jnum:
-                combined_list.append(Job(oj.jnum, oj.desc, oj.pm, nj.est, nj.act))
-            elif nj.jnum > oj.jnum:
-                combined_list.append(Job(nj.jnum, nj.desc, nj.pm, nj.est, nj.act))
-            else:
-                combined_list.append(Job(oj.jnum, oj.desc, oj.pm, oj.est, oj.act))
+    new_idx = 0
+    new_max = len(new_jobs)
 
-            break
+    while old_idx <= old_max - 1 and new_idx <= new_max - 1:
+        if old_jobs[old_idx].jnum < new_jobs[new_idx].jnum:
+            combined_list.append(old_jobs[old_idx])
+            old_idx += 1
+        else:
+            combined_list.append(new_jobs[new_idx])
+            new_idx += 1
+            if old_jobs[old_idx].jnum == new_jobs[new_idx - 1].jnum:
+                old_idx += 1
 
     return combined_list

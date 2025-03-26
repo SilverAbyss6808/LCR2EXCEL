@@ -28,7 +28,8 @@ while True:
 # take and verify input excel path
 print('\nNext, enter the path to your current cost-tracking spreadsheet.')
 while True:
-    input_excel_path = input(f'Path to Excel spreadsheet: ')
+    # todo: if no input spreadsheet (e.g. new year), create one
+    input_excel_path = input(f'Path to Excel spreadsheet (if none, press the Enter key): ')
     input_excel = frw.read_input_file(input_excel_path, '.xlsx')
     if input_excel:
         break

@@ -41,6 +41,7 @@ def read_input_file(path: string, filetype: string):
 
 def validate_proposed_filepath(path: string, filetype: string):
     directory = os.path.dirname(path)
+
     if directory is not None:
         if not os.path.isfile(path):
             if filetype == '.xlsx':
@@ -87,8 +88,8 @@ def read_excel(input_excel_path: string):
 
 def write_new_excel(new: list[dp.Job], old: list[dp.Job]):
     job_list = dp.compare_jobs(new, old)
-    for i in job_list:
-        print(str(i))
+    # todo: actually format data and write it to the excel sheet
+    return job_list
 
 
 # uncomment for test
@@ -97,14 +98,17 @@ def write_new_excel(new: list[dp.Job], old: list[dp.Job]):
 new_jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
 orig_jobs = read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
 
-for job in new_jobs:
-    print(f'NEW JOB: {str(job)}')
+# for job in new_jobs:
+#     print(f'NEW JOB: {str(job)}')
+#
+# for job in orig_jobs:
+#     print(f'OLD JOB: {str(job)}')
 
-for job in orig_jobs:
-    print(f'OLD JOB: {str(job)}')
+combined_jobs = write_new_excel(new_jobs, orig_jobs)
+
+for job in combined_jobs:
+    print(str(job.jnum))
 
 print(f'Number of new jobs: {len(new_jobs)}\n'
-      f'Number of preexisting jobs: {len(orig_jobs)}'
-      f'Number of combined jobs: ')
-
-write_new_excel(new_jobs, orig_jobs)
+      f'Number of preexisting jobs: {len(orig_jobs)}\n'
+      f'Number of combined jobs: {len(combined_jobs)}')
