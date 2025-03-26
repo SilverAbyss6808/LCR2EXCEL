@@ -2,6 +2,7 @@
 # this file is gonna be just for file interactions
 
 import openpyxl as opxl
+import xlsxwriter as xw
 import pypdf
 import string
 import os
@@ -74,41 +75,75 @@ def read_excel(input_excel_path: string):
     workbook = opxl.load_workbook(input_excel_path)
     active_sheet = workbook.active
 
-    rows: list = list(active_sheet.iter_rows(min_row=2, max_col=4, values_only=True))
+    rows: list = list(active_sheet.iter_rows(min_row=2, max_col=active_sheet.max_column, values_only=True))
     num_rows = active_sheet.max_row - 13  # starting from line 2, run until 12 lines from end cuz those aren't jobs
     num_jobs: int = int(num_rows / 4)  # number of lines minus title line, divided by four lines per job
 
-    for i in range(0, num_rows, 4):  # i is the index jsyk
+    for i in range(0, num_rows):  # i is the index jsyk
         current_row = (rows[i])
         excel_jobs.append(current_row)
 
-    excel_jobs = dp.create_jobs_from_excel_in(excel_jobs)
+    excel_jobs = dp.create_jobs_from_excel_in(excel_jobs, active_sheet.max_column)
     return excel_jobs
 
 
-def write_new_excel(new: list[dp.Job], old: list[dp.Job], path: string = ''):
+def get_title_row(input_excel_path: string):
+    workbook = opxl.load_workbook(input_excel_path)
+    active_sheet = workbook.active
+
+    row: list[str] = []
+
+    for i in range(1, active_sheet.max_column):
+        value = active_sheet.cell(1, i).value
+        row.append(value)
+
+    return row
+
+
+def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: string, new_path: string = ''):
     # todo: actually format data and write it to the excel sheet
     job_list = dp.compare_jobs(new, old)
-    dp.format_jobs(job_list)
+    formatted_job_list = dp.format_jobs_as_excel(job_list)
+
+    new_file = opxl.Workbook()
+    sheet = new_file.active
+
+    title_row = get_title_row(old_path)
+    sheet.append(title_row)
+
+    for row in formatted_job_list:
+        sheet.append(row)
+
+    print(len(formatted_job_list))
+
+    # todo: append title and end stuff
+
+    new_file.save(new_path)
+
+    return formatted_job_list
 
 
-# # uncomment for test
-# # both return lists of jobs !!! with relevant info !!!!!
-# # except for the stuff from the original excel, those dont have costs, those will be edited when the two are merged
-# new_jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
-# orig_jobs = read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
+# uncomment for test
+# both return lists of jobs !!! with relevant info !!!!!
+# except for the stuff from the original excel, those dont have costs, those will be edited when the two are merged
+new_jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
+orig_jobs = read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
+
+# for job in new_jobs:
+#     print(f'NEW JOB: {str(job)}')
 #
-# # for job in new_jobs:
-# #     print(f'NEW JOB: {str(job)}')
-# #
-# # for job in orig_jobs:
-# #     print(f'OLD JOB: {str(job)}')
-#
-# combined_jobs = write_new_excel(new_jobs, orig_jobs)
-#
-# for job in combined_jobs:
-#     print(str(job.jnum))
+# for job in orig_jobs:
+#     print(f'OLD JOB: {str(job)}')
+
+combined_jobs = create_write_new_excel(new_jobs, orig_jobs, '..\\io\\Labor Tracking Spreadsheet 2024.xlsx', '..\\io\\Labor Tracking Spreadsheet 2024-MOD.xlsx')
+
+for job in combined_jobs:
+    print(str(job))
 #
 # print(f'Number of new jobs: {len(new_jobs)}\n'
 #       f'Number of preexisting jobs: {len(orig_jobs)}\n'
 #       f'Number of combined jobs: {len(combined_jobs)}')
+
+# read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
+
+
