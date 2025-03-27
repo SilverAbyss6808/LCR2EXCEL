@@ -229,18 +229,16 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                     row = [jnum_formatted, f'=A{index}', job.desc, job.pm, f'=D{index}', 'Estimate']
 
                     col_filled = 6
+
                     for est in job.prev_ests:
                         row.append(est)
                         col_filled += 1
 
-                    while (max_col - col_filled) > 0:
+                    while (max_col - col_filled) > 1:  # leave one column for the new stuff
                         row.append('')
                         col_filled += 1
 
-                    if job.est != 0:
-                        row.append(job.est)
-                    else:
-                        row.append('')
+                    row.append(job.est)
 
                 case 1:  # second row, should have actual costs and formulas
                     row = ['', f'=A{index - 1}', '', '', f'=D{index - 1}', 'Actual']
@@ -250,14 +248,11 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                         row.append(act)
                         col_filled += 1
 
-                    while (max_col - col_filled) > 0:
+                    while (max_col - col_filled) > 1:
                         row.append('')
                         col_filled += 1
 
-                    if job.act != 0:
-                        row.append(job.act)
-                    else:
-                        row.append('')
+                    row.append(job.act)
 
                 case 2:  # third row, should be almost all formulas
                     row = ['', f'=A{index - 2}', '', '', f'=D{index - 2}', 'Last Week']
@@ -265,8 +260,8 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                     if max_col != 0:
                         row.append(0)
                         for ind in range(7, max_col):
-                            first_key = (alphabet.get('G') + ind) % 26
-                            second_key = (alphabet.get('F') + ind) % 26
+                            first_key = (alphabet.get('G') + (ind - 7)) % 26
+                            second_key = (alphabet.get('F') + (ind - 7)) % 26
 
                             first_cell_letter = [key for key, val in alphabet.items() if val == first_key]
                             second_cell_letter = [key for key, val in alphabet.items() if val == second_key]
@@ -279,12 +274,11 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                 case 3:  # fourth row, should be almost all formulas
                     row = ['', f'=A{index - 3}', '', '', f'=D{index - 3}', 'Remaining']
 
-                    if max_col != 0:
-                        for ind in range(6, max_col):
-                            new_key = (alphabet.get('G') + ind) % 26
-                            cell_letter = [key for key, val in alphabet.items() if val == new_key]
-                            cell_letter = str(cell_letter).replace('[\'', '').replace('\']', '')
-                            row.append(f'={cell_letter}{index - 3}-{cell_letter}{index - 2}')
+                    for ind in range(6, max_col):
+                        new_key = (alphabet.get('G') + (ind - 6)) % 26
+                        cell_letter = [key for key, val in alphabet.items() if val == new_key]
+                        cell_letter = str(cell_letter).replace('[\'', '').replace('\']', '')
+                        row.append(f'={cell_letter}{index - 3}-{cell_letter}{index - 2}')
 
                 case _:  # default case. it iterates through 0, 1, 2, and 3 so its literally not possible to get here
                     row = ''

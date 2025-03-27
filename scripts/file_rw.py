@@ -2,7 +2,6 @@
 # this file is gonna be just for file interactions
 
 import openpyxl as opxl
-import xlsxwriter as xw
 import pypdf
 import string
 import os
@@ -100,23 +99,21 @@ def get_title_row(input_excel_path: string):
     return row
 
 
-def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: string = '', new_path: string = ''):
-    if old is not None:
+def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: string, new_path: string):
+    if old_path != '':
         job_list = dp.compare_jobs(new, old)
         max_col = opxl.load_workbook(old_path).active.max_column
+        title_row = get_title_row(old_path)
     else:
         job_list = new
         max_col = 7
+        title_row = 'Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5'
 
     formatted_job_list = dp.format_jobs_as_excel(job_list, max_col)
 
     new_file = opxl.Workbook()
     sheet = new_file.active
 
-    if old_path != '':
-        title_row = get_title_row(old_path)
-    else:
-        title_row = 'Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5'
     sheet.append(title_row)
 
     for row in formatted_job_list:
@@ -127,29 +124,3 @@ def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: strin
     new_file.save(new_path)
 
     return formatted_job_list
-
-
-# # uncomment for test
-# # both return lists of jobs !!! with relevant info !!!!!
-# # except for the stuff from the original excel, those dont have costs, those will be edited when the two are merged
-# new_jobs = read_pdf('..\\io\\Tuttle Labor Cost.pdf')
-# orig_jobs = read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
-#
-# # for job in new_jobs:
-# #     print(f'NEW JOB: {str(job)}')
-# #
-# # for job in orig_jobs:
-# #     print(f'OLD JOB: {str(job)}')
-#
-# combined_jobs = create_write_new_excel(new_jobs, orig_jobs, '..\\io\\Labor Tracking Spreadsheet 2024.xlsx', '..\\io\\Labor Tracking Spreadsheet 2024-MOD.xlsx')
-#
-# for job in combined_jobs:
-#     print(str(job))
-#
-# print(f'Number of new jobs: {len(new_jobs)}\n'
-#       f'Number of preexisting jobs: {len(orig_jobs)}\n'
-#       f'Number of combined jobs: {len(combined_jobs)}')
-#
-# # read_excel('..\\io\\Labor Tracking Spreadsheet 2024.xlsx')
-
-

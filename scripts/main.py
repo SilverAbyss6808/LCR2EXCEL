@@ -1,11 +1,10 @@
 
 # this is gonna be the script that actually runs the program
 
-import data_processing as dp
 import file_rw as frw
-import openpyxl as opxl
 import string
 import os
+import main_choices as choice
 
 
 input_pdf_path: string  # path to pdf file
@@ -30,7 +29,6 @@ while True:
 # take and verify input excel path
 print('\nNext, enter the path to your current cost-tracking spreadsheet.')
 while True:
-    # todo: if no input spreadsheet (e.g. new year), create one
     input_excel_path = input(f'Path to Excel spreadsheet (if none, press the Enter key): ')
     if input_excel_path != '':
         input_excel = frw.read_input_file(input_excel_path, '.xlsx')
@@ -41,7 +39,6 @@ while True:
         break
 
 # print proposed output file and path
-# output_excel_path = f'{input_excel_path}-MODIFIED'
 if input_excel_path != '':
     split_ext = os.path.splitext(input_excel_path)
     output_excel_path = f'{split_ext[0]}-MODIFIED{split_ext[1]}'
@@ -64,10 +61,14 @@ while True:
             break
 
 # process data !!
-jobs_from_pdf = frw.read_pdf(input_pdf_path)  # returns the relevant info from the pdf
-if input_excel_path != '':
-    jobs_from_excel = frw.read_excel(input_excel_path)
-else:
-    jobs_from_excel = []
+try:
+    if input_excel_path == '':
+        choice.create_new_excel_from_pdf(input_pdf_path, output_excel_path)
+    else:
+        choice.add_pdf_data_to_existing_spreadsheet(input_pdf_path, input_excel_path, output_excel_path)
+except:
+    print('An error occurred. Please try again.')
+    exit(1)
 
-frw.create_write_new_excel(jobs_from_pdf, jobs_from_excel, input_excel_path, output_excel_path)
+exit_confirm = input(f'{output_excel_path} successfully created! Press Enter to exit.')
+exit(0)
