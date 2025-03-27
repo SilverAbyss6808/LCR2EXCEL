@@ -41,20 +41,24 @@ class Job:
     pm: string
     est: int
     act: int
-    prev_costs: dict = {}
+    prev_ests: list[int] = []
+    prev_acts: list[int] = []
 
-    def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int, prev_costs: dict = None):
+    def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int,
+                 prev_ests: list[int], prev_acts: list[int]):
         self.jnum = jnum
         self.desc = desc
         self.pm = pm
         self.est = est
         self.act = act
-        self.prev_costs = prev_costs
+        self.prev_ests = prev_ests
+        self.prev_acts = prev_acts
 
     def __str__(self):
         return (f'Job Number: {self.jnum}, Project Manager: {self.pm}, Description: {self.desc}\n'
                 f'Estimated Cost: {self.est}, Actual Cost: {self.act}\n'
-                f'Previous Costs: {self.prev_costs}\n')
+                f'Previous Estimates: {self.prev_ests}\n'
+                f'Previous Actuals: {self.prev_acts}\n')
 
 
 class JobRow:
@@ -64,18 +68,21 @@ class JobRow:
     column2: string = ''  # pm
     pm: string = ''  # should be the value of column2 every time
     column5: string = ''  # 0=Estimate, 1=Actual, 2=Last Week, 3=Remaining
-    prev_costs: dict = {}
+    prev_ests: list[int] = []
+    prev_acts: list[int] = []
     current_est: int = 0
     current_act: int = 0
 
-    def __init__(self, column1, jobno, desc, column2, pm, column5, prev_costs, current_est, current_act):
+    def __init__(self, column1, jobno, desc, column2, pm, column5, prev_ests: list[int],
+                 prev_acts: list[int], current_est, current_act):
         self.column1 = column1
         self.jobno = jobno
         self.desc = desc
         self.column2 = column2
         self.pm = pm
         self.column5 = column5
-        self.prev_costs = prev_costs
+        self.prev_ests = prev_ests
+        self.prev_acts = prev_acts
         self.current_est = current_est
         self.current_act = current_act
 
@@ -131,7 +138,7 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 
         if jnum != 'DEFAULT' and desc != 'DEFAULT' and pm != 'DEFAULT' and est != 99999999 and act != 99999999:
             # add job to list and reset variables
-            jobs.append(Job(jnum, desc, pm, est, act, prev_costs=None))  # no previous costs cause new data
+            jobs.append(Job(jnum, desc, pm, est, act, prev_ests=[], prev_acts=[]))
 
             jnum = 99999999
             desc = 'DEFAULT'
@@ -152,6 +159,7 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
 
     for index, job in enumerate(data):
         idx_mod = index % 4
+
         if idx_mod == 0:
             jnum = None
             if job[0] is not None:
@@ -160,22 +168,27 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
             desc = job[2]
             pm = job[3]
 
-            prev_costs: dict = {}
-            prev_est: dict = {}
-            prev_job_estimate = -1
+            prev_est: list[int] = []
+            prev_act: list[int] = []
 
-            for inner_idx, col in enumerate(range(6, max_col)):  # estimated costs start at 6 on line 0
-                if job[col] == prev_job_estimate:
-                    prev_est[inner_idx] = f'prev{inner_idx}'
+            lastint = 0
+            for col in range(6, max_col):  # estimated costs start at 6 on line 0
+                if isinstance(job[col], int):
+                    prev_est.append(job[col])
+                    lastint = job[col]
+                elif isinstance(job[col], str):
+                    prev_est.append(lastint)
                 else:
-                    prev_est[inner_idx] = job[col]
-                    prev_job_estimate = job[col]
+                    prev_est.append(0)
 
         elif idx_mod == 1:
-            for inner_idx, col in enumerate(range(6, max_col)):  # actual costs start at 6 on line 1
-                prev_costs[prev_est[inner_idx]] = job[col]
+            for col in range(6, max_col):  # estimated costs start at 6 on line 0
+                if isinstance(job[col], int):
+                    prev_act.append(job[col])
+                else:
+                    prev_act.append(0)
 
-            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_costs))
+            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act))
 
     return orig_job_list_excel
 
@@ -202,60 +215,81 @@ def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both
     return combined_list
 
 
-def format_jobs_as_excel(list_to_format: list[Job]):
+def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
     formatted_job_list: list = []
+    index = 2  # starting at row 2 to leave 1 for title
 
-    for index, job in enumerate(list_to_format, 2):  # starting at 2 to leave 1 for title
-        row_mod = index % 4
+    for job in list_to_format:
+        for i in range(0, 4):
+            match i:
+                case 0:  # first row of four, should have all info but actual costs
+                    jnum_formatted = str(job.jnum)
+                    jnum_formatted = jnum_formatted[:2] + '-' + jnum_formatted[2:4] + '-' + jnum_formatted[4:]
 
-        match row_mod:
-            case 2:  # first row of four, should have all info but actual costs
-                jnum_formatted = str(job.jnum)
-                jnum_formatted = jnum_formatted[:2] + '-' + jnum_formatted[2:4] + '-' + jnum_formatted[4:]
+                    row = [jnum_formatted, f'=A{index}', job.desc, job.pm, f'=D{index}', 'Estimate']
 
-                row = [jnum_formatted, f'=A{index}', job.desc, job.pm, f'=D{index}', 'Estimate']
-
-                if job.prev_costs is not None:
-                    for est in job.prev_costs.keys():
+                    col_filled = 6
+                    for est in job.prev_ests:
                         row.append(est)
-            case 3:  # second row, should have actual costs and formulas
-                row = ['', f'=A{index - 1}', '', '', f'=D{index - 1}', 'Actual']
+                        col_filled += 1
 
-                if job.prev_costs is not None:
-                    for act in job.prev_costs.values():
+                    while (max_col - col_filled) > 0:
+                        row.append('')
+                        col_filled += 1
+
+                    if job.est != 0:
+                        row.append(job.est)
+                    else:
+                        row.append('')
+
+                case 1:  # second row, should have actual costs and formulas
+                    row = ['', f'=A{index - 1}', '', '', f'=D{index - 1}', 'Actual']
+
+                    col_filled = 6
+                    for act in job.prev_acts:
                         row.append(act)
-            case 0:  # third row, should be almost all formulas
-                row = ['', f'=A{index - 2}', '', '', f'=D{index - 2}', 'Last Week', 0]
+                        col_filled += 1
 
-                first_cell_letter = 'H'
-                second_cell_letter = 'G'
+                    while (max_col - col_filled) > 0:
+                        row.append('')
+                        col_filled += 1
 
-                if job.prev_costs is not None:
-                    for ind in range(1, len(job.prev_costs)):
-                        first_key = (alphabet.get('H') + (ind + 1)) % 26
-                        second_key = (alphabet.get('G') + ind) % 26
+                    if job.act != 0:
+                        row.append(job.act)
+                    else:
+                        row.append('')
 
-                        first_cell_letter = [key for key, val in alphabet.items() if val == first_key]
-                        second_cell_letter = [key for key, val in alphabet.items() if val == second_key]
+                case 2:  # third row, should be almost all formulas
+                    row = ['', f'=A{index - 2}', '', '', f'=D{index - 2}', 'Last Week']
 
-                        first_cell_letter = str(first_cell_letter).replace('[\'', '').replace('\']', '')
-                        second_cell_letter = str(second_cell_letter).replace('[\'', '').replace('\']', '')
+                    if max_col != 0:
+                        row.append(0)
+                        for ind in range(7, max_col):
+                            first_key = (alphabet.get('G') + ind) % 26
+                            second_key = (alphabet.get('F') + ind) % 26
 
-                        row.append(f'={first_cell_letter}{index - 1}-{second_cell_letter}{index - 1}')
+                            first_cell_letter = [key for key, val in alphabet.items() if val == first_key]
+                            second_cell_letter = [key for key, val in alphabet.items() if val == second_key]
 
-            case 1:  # fourth row, should be almost all formulas
-                row = ['', f'=A{index - 3}', '', '', f'=D{index - 3}', 'Remaining']
+                            first_cell_letter = str(first_cell_letter).replace('[\'', '').replace('\']', '')
+                            second_cell_letter = str(second_cell_letter).replace('[\'', '').replace('\']', '')
 
-                if job.prev_costs is not None:
-                    for ind in range(0, len(job.prev_costs)):
-                        new_key = (alphabet.get('G') + ind) % 26
-                        cell_letter = [key for key, val in alphabet.items() if val == new_key]
-                        cell_letter = str(cell_letter).replace('[\'', '').replace('\']', '')
-                        row.append(f'={cell_letter}{index - 3}-{cell_letter}{index - 2}')
+                            row.append(f'={first_cell_letter}{index - 1}-{second_cell_letter}{index - 1}')
 
-            case _:  # default case. inform user of error?
-                row = ''
+                case 3:  # fourth row, should be almost all formulas
+                    row = ['', f'=A{index - 3}', '', '', f'=D{index - 3}', 'Remaining']
 
-        formatted_job_list.append(row)
+                    if max_col != 0:
+                        for ind in range(6, max_col):
+                            new_key = (alphabet.get('G') + ind) % 26
+                            cell_letter = [key for key, val in alphabet.items() if val == new_key]
+                            cell_letter = str(cell_letter).replace('[\'', '').replace('\']', '')
+                            row.append(f'={cell_letter}{index - 3}-{cell_letter}{index - 2}')
+
+                case _:  # default case. it iterates through 0, 1, 2, and 3 so its literally not possible to get here
+                    row = ''
+
+            index += 1
+            formatted_job_list.append(row)
 
     return formatted_job_list

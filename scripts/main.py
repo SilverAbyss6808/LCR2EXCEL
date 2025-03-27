@@ -7,11 +7,11 @@ import openpyxl as opxl
 import string
 import os
 
-from scripts.file_rw import write_new_excel
 
 input_pdf_path: string  # path to pdf file
 input_excel_path: string    # path to original spreadsheet
 output_excel_path: string   # path to output spreadsheet: should be in the same directory as the input
+
 
 print(
     f'###############################################\n'
@@ -32,14 +32,21 @@ print('\nNext, enter the path to your current cost-tracking spreadsheet.')
 while True:
     # todo: if no input spreadsheet (e.g. new year), create one
     input_excel_path = input(f'Path to Excel spreadsheet (if none, press the Enter key): ')
-    input_excel = frw.read_input_file(input_excel_path, '.xlsx')
-    if input_excel:
+    if input_excel_path != '':
+        input_excel = frw.read_input_file(input_excel_path, '.xlsx')
+        if input_excel:
+            break
+    else:
+        input_excel_path = ''
         break
 
 # print proposed output file and path
 # output_excel_path = f'{input_excel_path}-MODIFIED'
-split_ext = os.path.splitext(input_excel_path)
-output_excel_path = f'{split_ext[0]}-MODIFIED{split_ext[1]}'
+if input_excel_path != '':
+    split_ext = os.path.splitext(input_excel_path)
+    output_excel_path = f'{split_ext[0]}-MODIFIED{split_ext[1]}'
+else:
+    output_excel_path = f'NewSpreadsheet.xlsx'
 
 while True:
     confirm = input(f'\nProposed output file {output_excel_path}. Is this okay? [y/n] ')
@@ -58,6 +65,9 @@ while True:
 
 # process data !!
 jobs_from_pdf = frw.read_pdf(input_pdf_path)  # returns the relevant info from the pdf
-jobs_from_excel = frw.read_excel(input_excel_path)
+if input_excel_path != '':
+    jobs_from_excel = frw.read_excel(input_excel_path)
+else:
+    jobs_from_excel = []
 
-frw.write_new_excel(jobs_from_pdf, jobs_from_excel, output_excel_path)
+frw.create_write_new_excel(jobs_from_pdf, jobs_from_excel, input_excel_path, output_excel_path)
