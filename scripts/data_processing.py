@@ -234,7 +234,7 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                         row.append(est)
                         col_filled += 1
 
-                    while (max_col - col_filled) > 1:  # leave one column for the new stuff
+                    while (max_col - col_filled) > 0:
                         row.append('')
                         col_filled += 1
 
@@ -248,7 +248,7 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                         row.append(act)
                         col_filled += 1
 
-                    while (max_col - col_filled) > 1:
+                    while (max_col - col_filled) > 0:
                         row.append('')
                         col_filled += 1
 
@@ -259,9 +259,9 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
 
                     if max_col != 0:
                         row.append(0)
-                        for ind in range(7, max_col):
-                            first_key = (alphabet.get('G') + (ind - 7)) % 26
-                            second_key = (alphabet.get('F') + (ind - 7)) % 26
+                        for ind in range(6, max_col):
+                            first_key = (alphabet.get('G') + (ind - 6)) % 26
+                            second_key = (alphabet.get('F') + (ind - 6)) % 26
 
                             first_cell_letter = [key for key, val in alphabet.items() if val == first_key]
                             second_cell_letter = [key for key, val in alphabet.items() if val == second_key]
@@ -274,8 +274,8 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                 case 3:  # fourth row, should be almost all formulas
                     row = ['', f'=A{index - 3}', '', '', f'=D{index - 3}', 'Remaining']
 
-                    for ind in range(6, max_col):
-                        new_key = (alphabet.get('G') + (ind - 6)) % 26
+                    for ind in range(7, max_col + 2):  # +2 because 1 for new column and 1 to make sure it actually runs
+                        new_key = (alphabet.get('G') + (ind - 7)) % 26
                         cell_letter = [key for key, val in alphabet.items() if val == new_key]
                         cell_letter = str(cell_letter).replace('[\'', '').replace('\']', '')
                         row.append(f'={cell_letter}{index - 3}-{cell_letter}{index - 2}')
