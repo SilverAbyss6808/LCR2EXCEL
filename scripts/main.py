@@ -9,7 +9,7 @@ import main_choices as choice
 
 input_pdf_path: string  # path to pdf file
 input_excel_path: string    # path to original spreadsheet
-output_excel_path: string   # path to output spreadsheet: should be in the same directory as the input
+output_excel_path: string  # path to output spreadsheet: should be in the same directory as the input
 
 
 print(

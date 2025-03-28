@@ -6,6 +6,7 @@ import pypdf
 import string
 import os
 import data_processing as dp
+import visual_formatting as vf
 
 
 pdf_date: string
@@ -120,6 +121,11 @@ def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: strin
         sheet.append(row)
 
     # todo: append end stuff
+
+    # formatting :3
+    vf.format_widths(sheet)
+    vf.color_every_other_line(sheet, '00FFFFFF', '00DDEBF7')
+
 
     new_file.save(new_path)
 
