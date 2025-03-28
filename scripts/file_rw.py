@@ -9,9 +9,6 @@ import data_processing as dp
 import visual_formatting as vf
 
 
-pdf_date: string
-
-
 def read_input_file(path: string, filetype: string):
     # check if the path exists and is a valid pdf/xlsx
     try:
@@ -108,13 +105,14 @@ def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: strin
     else:
         job_list = new
         max_col = 6
-        title_row = 'Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5'
+        title_row: list[str] = ['Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5']
 
     formatted_job_list = dp.format_jobs_as_excel(job_list, max_col)
 
     new_file = opxl.Workbook()
     sheet = new_file.active
 
+    title_row.append(dp.pdf_date)
     sheet.append(title_row)
 
     for row in formatted_job_list:
@@ -124,8 +122,7 @@ def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: strin
 
     # formatting :3
     vf.format_widths(sheet)
-    vf.color_every_other_line(sheet, '00FFFFFF', '00DDEBF7')
-
+    vf.format_sheet_style(sheet, '00FFFFFF', '00DDEBF7')
 
     new_file.save(new_path)
 

@@ -1,10 +1,10 @@
 # this is where the stuff for processing the input pdf is gonna go
 # plus any other data processing things
 
-import openpyxl as opxl
 import string
 
 
+pdf_date: string = ''
 alphabet: dict = {
     'A': 1,
     'B': 2,
@@ -90,8 +90,14 @@ class JobRow:
 def format_pdf_data_as_job(data: string):  # return an array of jobs
     num_jobs: int = 0
     data_lines = data.split('\n')
+    date_found = False
+    global pdf_date
 
     for index, line in enumerate(data_lines):
+        if not date_found and 'System Date:' in line:
+            date_found = True
+            pdf_date = line.split(' ')[2].replace('-', '/')
+
         if 'Job Totals' in line:
             if 'Primary' not in line:
                 line += '\n'

@@ -43,7 +43,7 @@ if input_excel_path != '':
     split_ext = os.path.splitext(input_excel_path)
     output_excel_path = f'{split_ext[0]}-MODIFIED{split_ext[1]}'
 else:
-    output_excel_path = f'NewSpreadsheet.xlsx'
+    output_excel_path = f'..\\NewSpreadsheet.xlsx'
 
 while True:
     confirm = input(f'\nProposed output file {output_excel_path}. Is this okay? [y/n] ')
@@ -66,8 +66,8 @@ try:
         choice.create_new_excel_from_pdf(input_pdf_path, output_excel_path)
     else:
         choice.add_pdf_data_to_existing_spreadsheet(input_pdf_path, input_excel_path, output_excel_path)
-except:
-    print('An error occurred. Please try again.')
+except Exception as ex:
+    print(f'Error: {ex}')
     exit(1)
 
 exit_confirm = input(f'{output_excel_path} successfully created! Press Enter to exit.')
