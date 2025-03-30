@@ -16,7 +16,7 @@ def format_widths(sheet):
     max_col = sheet.max_column
 
     for col in range(7, max_col + 2):
-        sheet.column_dimensions[get_column_letter(col)].width = 10
+        sheet.column_dimensions[get_column_letter(col)].width = 12
 
 
 def format_sheet_style(sheet, line_color1, line_color2):

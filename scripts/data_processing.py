@@ -126,7 +126,11 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
             cc = True
         elif cc:
             jnum_string = line.split(' ')[0]
-            jnum = int(jnum_string.replace('-', ''))
+            try:
+                jnum = int(jnum_string.replace('-', ''))
+            except ValueError:
+                cc = False
+                continue
 
             desc = line.replace(jnum_string + ' ', '')
             cc = False
@@ -269,8 +273,8 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                     if max_col != 0:
                         row.append(0)
                         for ind in range(6, max_col):
-                            first_key = (alphabet.get('G') + (ind - 6)) % 26
-                            second_key = (alphabet.get('F') + (ind - 6)) % 26
+                            first_key = (alphabet.get('H') + (ind - 6)) % 26
+                            second_key = (alphabet.get('G') + (ind - 6)) % 26
 
                             first_cell_letter = [key for key, val in alphabet.items() if val == first_key]
                             second_cell_letter = [key for key, val in alphabet.items() if val == second_key]
