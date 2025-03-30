@@ -275,7 +275,9 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                             first_cell_letter = str(first_cell_letter).replace('[\'', '').replace('\']', '')
                             second_cell_letter = str(second_cell_letter).replace('[\'', '').replace('\']', '')
 
-                            row.append(f'={first_cell_letter}{index - 1}-{second_cell_letter}{index - 1}')
+                            # row.append(f'={first_cell_letter}{index - 1}-{second_cell_letter}{index - 1}')
+                            row.append(f'=IF(AND(ISNUMBER({first_cell_letter}{index-1}),ISNUMBER({second_cell_letter}{index-1})), '
+                                       f'{first_cell_letter}{index-1}-{second_cell_letter}{index-1}, "")')
 
                 case 3:  # fourth row, should be almost all formulas
                     row = ['', f'=A{index - 3}', '', '', f'=D{index - 3}', 'Remaining']

@@ -2,7 +2,6 @@
 # excel sheet formatting stuff here
 
 from openpyxl.styles import PatternFill, Border, Side, Font, Alignment
-from openpyxl.styles.numbers import NumberFormat
 from openpyxl.utils import get_column_letter
 
 def format_widths(sheet):
@@ -11,7 +10,7 @@ def format_widths(sheet):
     sheet.column_dimensions['B'].width = 10.5
     sheet.column_dimensions['C'].width = 35
     sheet.column_dimensions['D'].width = 8
-    sheet.column_dimensions['E'].width = 4
+    sheet.column_dimensions['E'].width = 6
     sheet.column_dimensions['F'].width = 10
 
     max_col = sheet.max_column

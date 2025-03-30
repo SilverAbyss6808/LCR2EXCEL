@@ -17,3 +17,5 @@ def create_new_excel_from_pdf(input_pdf_path, output_excel_path):
 
     frw.create_write_new_excel(jobs_from_pdf, [], '', output_excel_path)
 
+
+add_pdf_data_to_existing_spreadsheet('..\\test\\Tuttle Labor Cost 02 08 25.pdf', '..\\NewSpreadsheet.xlsx', '..\\NewSpreadsheet-MODIFIED.xlsx')

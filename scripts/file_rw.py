@@ -98,14 +98,24 @@ def get_title_row(input_excel_path: string):
 
 
 def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: string, new_path: string):
+    max_col: int
+    job_list: list
+    title_row: list[str] = []
+
     if old_path != '':
+        old_sheet = opxl.load_workbook(old_path).active
+
         job_list = dp.compare_jobs(new, old)
-        max_col = opxl.load_workbook(old_path).active.max_column
-        title_row = get_title_row(old_path)
+        max_col = old_sheet.max_column
+        tr_gen = old_sheet.iter_rows(max_row=1, values_only=True)
+
+        for cell in tr_gen:
+            for val in cell:
+                title_row.append(val)
     else:
         job_list = new
         max_col = 6
-        title_row: list[str] = ['Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5']
+        title_row = ['Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5']
 
     formatted_job_list = dp.format_jobs_as_excel(job_list, max_col)
 
