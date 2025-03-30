@@ -212,11 +212,14 @@ def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both
         if old_jobs[old_idx].jnum < new_jobs[new_idx].jnum:
             combined_list.append(old_jobs[old_idx])
             old_idx += 1
-        else:
+        elif old_jobs[old_idx].jnum > new_jobs[new_idx].jnum:
             combined_list.append(new_jobs[new_idx])
             new_idx += 1
-            if old_jobs[old_idx].jnum == new_jobs[new_idx - 1].jnum:
-                old_idx += 1
+        else:
+            combined_list.append(Job(new_jobs[new_idx].jnum, new_jobs[new_idx].desc, new_jobs[new_idx].pm, new_jobs[new_idx].est,
+                                     new_jobs[new_idx].act, old_jobs[old_idx].prev_ests, old_jobs[old_idx].prev_acts))
+            new_idx += 1
+            old_idx += 1
 
     return combined_list
 
@@ -277,7 +280,7 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
 
                             # row.append(f'={first_cell_letter}{index - 1}-{second_cell_letter}{index - 1}')
                             row.append(f'=IF(AND(ISNUMBER({first_cell_letter}{index-1}),ISNUMBER({second_cell_letter}{index-1})), '
-                                       f'{first_cell_letter}{index-1}-{second_cell_letter}{index-1}, "")')
+                                       f'{first_cell_letter}{index-1}-{second_cell_letter}{index-1}, 0)')
 
                 case 3:  # fourth row, should be almost all formulas
                     row = ['', f'=A{index - 3}', '', '', f'=D{index - 3}', 'Remaining']

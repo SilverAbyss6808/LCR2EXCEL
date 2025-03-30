@@ -9,7 +9,7 @@ def format_widths(sheet):
     sheet.column_dimensions['A'].width = 10.5
     sheet.column_dimensions['B'].width = 10.5
     sheet.column_dimensions['C'].width = 35
-    sheet.column_dimensions['D'].width = 8
+    sheet.column_dimensions['D'].width = 9
     sheet.column_dimensions['E'].width = 6
     sheet.column_dimensions['F'].width = 10
 

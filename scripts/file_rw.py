@@ -72,8 +72,8 @@ def read_excel(input_excel_path: string):
     workbook = opxl.load_workbook(input_excel_path)
     active_sheet = workbook.active
 
-    rows: list = list(active_sheet.iter_rows(min_row=2, max_col=active_sheet.max_column, values_only=True))
-    num_rows = active_sheet.max_row - 13  # starting from line 2, run until 12 lines from end cuz those aren't jobs
+    rows: list = list(active_sheet.iter_rows(min_row=2, values_only=True))
+    num_rows = active_sheet.max_row - 1
     num_jobs: int = int(num_rows / 4)  # number of lines minus title line, divided by four lines per job
 
     for i in range(0, num_rows):  # i is the index jsyk
@@ -82,19 +82,6 @@ def read_excel(input_excel_path: string):
 
     excel_jobs = dp.create_jobs_from_excel_in(excel_jobs, active_sheet.max_column)
     return excel_jobs
-
-
-def get_title_row(input_excel_path: string):
-    workbook = opxl.load_workbook(input_excel_path)
-    active_sheet = workbook.active
-
-    row: list[str] = []
-
-    for i in range(1, active_sheet.max_column):
-        value = active_sheet.cell(1, i).value
-        row.append(value)
-
-    return row
 
 
 def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: string, new_path: string):
