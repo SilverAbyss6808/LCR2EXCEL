@@ -22,3 +22,4 @@ When you're reporting a bug, please include:
 3. Any relevant screenshots, error codes, etc.
 
 ## Questions? Comments? Ideas for further development? Let me know at **baxterlila3030@gmail.com**!
+### Further development plans can be found [here](https://trello.com/b/dQQqO0qh/lcr2excel).
