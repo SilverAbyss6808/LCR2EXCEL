@@ -1,5 +1,5 @@
-time worked: 25.5h
-time recorded: 14h
+time worked: 34.5h
+time recorded: 34.5h
 
 pre-03/21   5
 03/21       1
@@ -11,3 +11,5 @@ pre-03/21   5
 03/27       1
 03/28       4.5
 03/29       4.5
+=== recorded ===
+04/01       1
