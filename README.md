@@ -4,7 +4,7 @@
 ### To install:
 1. Download the source code ZIP file from [here](https://github.com/SilverAbyss6808/LCR2EXCEL/tags). Make sure you download the most recent version (right now, that's v0.1.0).
 2. Extract the ZIP file somewhere on your computer - it doesn't matter where.
-3. Run the LCR2EXCEL.exe file!
+3. Run the LCR2EXCEL.exe file. It'll be located in the LCR2EXCEL\dist\main folder.
 
 **Important note: don't move the exe file out of the folder it's in - if you want it to be in an easier-to-access spot, create a shortcut, then put that shortcut wherever you want.**
 
