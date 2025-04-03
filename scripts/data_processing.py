@@ -158,8 +158,8 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 
     # reports if there's a discrepancy found so the data can be reviewed
     if len(jobs) != num_jobs:
-        print(f'Though {num_jobs} were found, {len(jobs)} were actually reported. You may want to check your data.')
-
+        # print(f'Though {num_jobs} were found, {len(jobs)} were actually reported. You may want to check your data.')
+        pass
     return jobs
 
 
@@ -183,18 +183,23 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
 
             lastint = 0
             for col in range(6, max_col):  # estimated costs start at 6 on line 0
-                if isinstance(job[col], int):
+                # print(f'{job[col]}: {type(job[col])}')
+                if isinstance(job[col], int) and job[col] != 0:
                     prev_est.append(job[col])
                     lastint = job[col]
-                elif isinstance(job[col], str):
+                elif isinstance(job[col], str) or job[col] == 0 or job[col] is None:
                     prev_est.append(lastint)
                 else:
                     prev_est.append(0)
 
         elif idx_mod == 1:
+            lastint = 0
             for col in range(6, max_col):  # estimated costs start at 6 on line 0
-                if isinstance(job[col], int):
+                if isinstance(job[col], int) and job[col] != 0:
                     prev_act.append(job[col])
+                    lastint = job[col]
+                elif job[col] == 0 or job[col] is None:
+                    prev_act.append(lastint)
                 else:
                     prev_act.append(0)
 
@@ -242,30 +247,42 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                     row = [jnum_formatted, f'=A{index}', job.desc, job.pm, f'=D{index}', 'Estimate']
 
                     col_filled = 6
+                    current_prev = 0
 
                     for est in job.prev_ests:
                         row.append(est)
+                        current_prev = est
                         col_filled += 1
 
+                    # really shouldnt execute :P leaving it in just in case though
                     while (max_col - col_filled) > 0:
                         row.append('')
                         col_filled += 1
 
-                    row.append(job.est)
+                    if job.est != 0:
+                        row.append(job.est)
+                    else:
+                        row.append(current_prev)
 
                 case 1:  # second row, should have actual costs and formulas
                     row = ['', f'=A{index - 1}', '', '', f'=D{index - 1}', 'Actual']
 
                     col_filled = 6
+                    current_prev = 0
+
                     for act in job.prev_acts:
                         row.append(act)
                         col_filled += 1
+                        current_prev = act
 
                     while (max_col - col_filled) > 0:
                         row.append('')
                         col_filled += 1
 
-                    row.append(job.act)
+                    if job.act != 0:
+                        row.append(job.act)
+                    else:
+                        row.append(current_prev)
 
                 case 2:  # third row, should be almost all formulas
                     row = ['', f'=A{index - 2}', '', '', f'=D{index - 2}', 'Last Week']
@@ -282,7 +299,6 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                             first_cell_letter = str(first_cell_letter).replace('[\'', '').replace('\']', '')
                             second_cell_letter = str(second_cell_letter).replace('[\'', '').replace('\']', '')
 
-                            # row.append(f'={first_cell_letter}{index - 1}-{second_cell_letter}{index - 1}')
                             row.append(f'=IF(AND(ISNUMBER({first_cell_letter}{index-1}),ISNUMBER({second_cell_letter}{index-1})), '
                                        f'{first_cell_letter}{index-1}-{second_cell_letter}{index-1}, 0)')
 
