@@ -6,7 +6,7 @@
 2. Extract the ZIP file somewhere on your computer - it doesn't matter where.
 3. Run the LCR2EXCEL.exe file. It'll be located in the LCR2EXCEL\dist\main folder. Alternatively, use the shortcut provided in the LCR2EXCEL folder.
 
-**Important note: don't move the exe file out of the folder it's in - if you want it to be in an easier-to-access spot, move the provided shortcut to wherever you want.**
+**Important note: don't move the exe file out of the folder it's in - if you want it to be in an easier-to-access spot, create a shortcut, then put that shortcut wherever you want.**
 
 ***
 
