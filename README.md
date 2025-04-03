@@ -20,7 +20,7 @@
 ### To use (creating a new spreadsheet):
 1. Run the program! You'll see a terminal pop up.
 2. Enter the file path to the Labor Cost Report - make sure it's a .pdf file.
-3. When asked for the path to an Excel sheet, just hit the Enter key. A default name will be given - you can change this if you want. NOTE: If you're specifying your own name, make sure you include the full path, e.g. **C:\Users\<YourUsername>\Documents\NewExcelSheet.xlsx**
+3. When asked for the path to an Excel sheet, just hit the Enter key. A default name will be given - you can change this if you want. NOTE: If you're specifying your own name, make sure you include the full path, e.g. **C:\Users\YourUsername\Documents\NewExcelSheet.xlsx**
 4. Let the program run!
 5. The new spreadsheet, if a directory is not specified in Step 3, will be generated in LCR2EXCEL\dist\.
 
