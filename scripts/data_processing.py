@@ -43,9 +43,10 @@ class Job:
     act: int
     prev_ests: list[int] = []
     prev_acts: list[int] = []
+    note: string = ''
 
     def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int,
-                 prev_ests: list[int], prev_acts: list[int]):
+                 prev_ests: list[int], prev_acts: list[int], note: string):
         self.jnum = jnum
         self.desc = desc
         self.pm = pm
@@ -53,12 +54,14 @@ class Job:
         self.act = act
         self.prev_ests = prev_ests
         self.prev_acts = prev_acts
+        self.note = note
 
     def __str__(self):
         return (f'Job Number: {self.jnum}, Project Manager: {self.pm}, Description: {self.desc}\n'
                 f'Estimated Cost: {self.est}, Actual Cost: {self.act}\n'
                 f'Previous Estimates: {self.prev_ests}\n'
-                f'Previous Actuals: {self.prev_acts}\n')
+                f'Previous Actuals: {self.prev_acts}\n'
+                f'Note: {self.note}\n')
 
 
 class JobRow:
