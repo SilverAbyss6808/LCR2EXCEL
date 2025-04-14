@@ -43,10 +43,10 @@ class Job:
     act: int
     prev_ests: list[int] = []
     prev_acts: list[int] = []
-    note: string = ''
+    note: list[(int, str)]
 
     def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int,
-                 prev_ests: list[int], prev_acts: list[int], note: string):
+                 prev_ests: list[int], prev_acts: list[int], note: list[(int, str)]):
         self.jnum = jnum
         self.desc = desc
         self.pm = pm
@@ -151,7 +151,7 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 
         if jnum != 'DEFAULT' and desc != 'DEFAULT' and pm != 'DEFAULT' and est != 99999999 and act != 99999999:
             # add job to list and reset variables
-            jobs.append(Job(jnum, desc, pm, est, act, prev_ests=[], prev_acts=[]))
+            jobs.append(Job(jnum, desc, pm, est, act, prev_ests=[], prev_acts=[], note=[None, None]))
 
             jnum = 99999999
             desc = 'DEFAULT'
@@ -169,9 +169,15 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 def create_jobs_from_excel_in(data: list[string], max_col: int):
     orig_job_list_excel: list[Job] = []
     est, act = 0, 0
+    note: list[(int, str)] = [None, None]
 
     for index, job in enumerate(data):
         idx_mod = index % 4
+        if idx_mod == 0:  # reset list of notes at beginning of job
+            note = [None, None]
+
+        if job[max_col - 1] is not None:
+            note.append((idx_mod, job[max_col - 1]))
 
         if idx_mod == 0:
             jnum = None
@@ -185,11 +191,12 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
             prev_act: list[int] = []
 
             lastint = 0
-            for col in range(6, max_col):  # estimated costs start at 6 on line 0
-                # print(f'{job[col]}: {type(job[col])}')
+            for col in range(6, max_col):  # estimated costs start at 6 on first row of four
                 if isinstance(job[col], int) and job[col] != 0:
                     prev_est.append(job[col])
                     lastint = job[col]
+                elif col == max_col - 1:  # this is the notes row, should break to allow note to be copied
+                    break
                 elif isinstance(job[col], str) or job[col] == 0 or job[col] is None:
                     prev_est.append(lastint)
                 else:
@@ -197,16 +204,23 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
 
         elif idx_mod == 1:
             lastint = 0
-            for col in range(6, max_col):  # estimated costs start at 6 on line 0
+            for col in range(6, max_col):  # actual costs start at 6 on second row of four
                 if isinstance(job[col], int) and job[col] != 0:
                     prev_act.append(job[col])
                     lastint = job[col]
+                elif col == max_col - 1:  # this is the notes row, should break to allow note to be copied
+                    break
                 elif job[col] == 0 or job[col] is None:
                     prev_act.append(lastint)
                 else:
                     prev_act.append(0)
 
-            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act))
+        elif idx_mod == 3:  # this is the last row of a job, so all info will be known
+            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act, note))
+            # print(str(Job(jnum, desc, pm, est, act, prev_est, prev_act, note)))
+
+        else:
+            pass
 
     return orig_job_list_excel
 
@@ -229,7 +243,7 @@ def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both
             new_idx += 1
         else:
             combined_list.append(Job(new_jobs[new_idx].jnum, new_jobs[new_idx].desc, new_jobs[new_idx].pm, new_jobs[new_idx].est,
-                                     new_jobs[new_idx].act, old_jobs[old_idx].prev_ests, old_jobs[old_idx].prev_acts))
+                                     new_jobs[new_idx].act, old_jobs[old_idx].prev_ests, old_jobs[old_idx].prev_acts, old_jobs[old_idx].note))
             new_idx += 1
             old_idx += 1
 
@@ -244,6 +258,7 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
         for i in range(0, 4):
             match i:
                 case 0:  # first row of four, should have all info but actual costs
+
                     jnum_formatted = str(job.jnum)
                     jnum_formatted = jnum_formatted[:2] + '-' + jnum_formatted[2:4] + '-' + jnum_formatted[4:]
 
@@ -316,6 +331,11 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
 
                 case _:  # default case. it iterates through 0, 1, 2, and 3 so its literally not possible to get here
                     row = ''
+
+            for nt in job.note:
+                if nt is not None and nt[0] == i:  # skip defaults
+                    # print(nt[1])
+                    row.append(nt[1])
 
             index += 1
             formatted_job_list.append(row)

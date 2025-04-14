@@ -98,18 +98,21 @@ def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: strin
 
         for cell in tr_gen:
             for val in cell:
-                title_row.append(val)
+                if val != 'Notes':
+                    title_row.append(val)
+
     else:
         job_list = new
         max_col = 6
         title_row = ['Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5']
 
-    formatted_job_list = dp.format_jobs_as_excel(job_list, max_col)
+    formatted_job_list = dp.format_jobs_as_excel(job_list, max_col - 1)  # again, no notes column
 
     new_file = opxl.Workbook()
     sheet = new_file.active
 
     title_row.append(dp.pdf_date)
+    title_row.append('Notes')
     sheet.append(title_row)
 
     for row in formatted_job_list:
