@@ -44,9 +44,11 @@ class Job:
     prev_ests: list[int] = []
     prev_acts: list[int] = []
     note: list[(int, str)]
+    grouped: bool = False
+    hidden: bool = False
 
-    def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int,
-                 prev_ests: list[int], prev_acts: list[int], note: list[(int, str)]):
+    def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int, prev_ests: list[int],
+                 prev_acts: list[int], note: list[(int, str)], grouped: bool, hidden: bool):
         self.jnum = jnum
         self.desc = desc
         self.pm = pm
@@ -55,6 +57,8 @@ class Job:
         self.prev_ests = prev_ests
         self.prev_acts = prev_acts
         self.note = note
+        self.grouped = grouped
+        self.hidden = hidden
 
     def __str__(self):
         return (f'Job Number: {self.jnum}, Project Manager: {self.pm}, Description: {self.desc}\n'
@@ -151,7 +155,7 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 
         if jnum != 'DEFAULT' and desc != 'DEFAULT' and pm != 'DEFAULT' and est != 99999999 and act != 99999999:
             # add job to list and reset variables
-            jobs.append(Job(jnum, desc, pm, est, act, prev_ests=[], prev_acts=[], note=[None, None]))
+            jobs.append(Job(jnum, desc, pm, est, act, prev_ests=[], prev_acts=[], note=[None, None], grouped=False, hidden=False))
 
             jnum = 99999999
             desc = 'DEFAULT'
@@ -170,16 +174,22 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
     orig_job_list_excel: list[Job] = []
     est, act = 0, 0
     note: list[(int, str)] = [None, None]
+    grouped = False
+    hidden = False
 
     for index, job in enumerate(data):
-        idx_mod = index % 4
-        if idx_mod == 0:  # reset list of notes at beginning of job
-            note = [None, None]
+        idx_mod = index % 4  # finds what row of the job it is
 
+        # note stuff and group states
+        if idx_mod == 0:  # reset list of notes/state of group at beginning of job
+            note = [None, None]
+            grouped = False
+            hidden = False
         if job[max_col - 1] is not None:
             note.append((idx_mod, job[max_col - 1]))
 
-        if idx_mod == 0:
+        # adds data to job according to what job row it is
+        if idx_mod == 0:  # first row of job. has most of the info
             jnum = None
             if job[0] is not None:
                 jnum = int(str(job[0]).replace('-', ''))
@@ -202,7 +212,7 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
                 else:
                     prev_est.append(0)
 
-        elif idx_mod == 1:
+        elif idx_mod == 1:  # second row of job. only has actual costs (and maybe notes but thats not processed here)
             lastint = 0
             for col in range(6, max_col):  # actual costs start at 6 on second row of four
                 if isinstance(job[col], int) and job[col] != 0:
@@ -216,10 +226,10 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
                     prev_act.append(0)
 
         elif idx_mod == 3:  # this is the last row of a job, so all info will be known
-            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act, note))
+            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden))
             # print(str(Job(jnum, desc, pm, est, act, prev_est, prev_act, note)))
 
-        else:
+        else:  # only the third line. no new info here
             pass
 
     return orig_job_list_excel
@@ -243,7 +253,8 @@ def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both
             new_idx += 1
         else:
             combined_list.append(Job(new_jobs[new_idx].jnum, new_jobs[new_idx].desc, new_jobs[new_idx].pm, new_jobs[new_idx].est,
-                                     new_jobs[new_idx].act, old_jobs[old_idx].prev_ests, old_jobs[old_idx].prev_acts, old_jobs[old_idx].note))
+                                     new_jobs[new_idx].act, old_jobs[old_idx].prev_ests, old_jobs[old_idx].prev_acts,
+                                     old_jobs[old_idx].note, old_jobs[old_idx].grouped, old_jobs[old_idx].hidden))
             new_idx += 1
             old_idx += 1
 
