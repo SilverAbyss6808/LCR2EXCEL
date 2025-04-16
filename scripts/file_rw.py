@@ -78,6 +78,18 @@ def read_excel(input_excel_path: string):
 
     for i in range(0, num_rows):  # i is the index jsyk
         current_row = (rows[i])
+        dim_data = ()
+        add_to_dd = ''
+
+        if active_sheet.row_dimensions[i].outlineLevel > 0:  # these are rows that are grouped together
+            add_to_dd += 'g'
+
+        if active_sheet.row_dimensions[i].hidden:  # rows that are hidden
+            add_to_dd += 'h'
+
+        dim_data += (add_to_dd,)
+        current_row = current_row + dim_data
+
         excel_jobs.append(current_row)
 
     excel_jobs = dp.create_jobs_from_excel_in(excel_jobs, active_sheet.max_column)

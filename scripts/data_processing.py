@@ -65,7 +65,8 @@ class Job:
                 f'Estimated Cost: {self.est}, Actual Cost: {self.act}\n'
                 f'Previous Estimates: {self.prev_ests}\n'
                 f'Previous Actuals: {self.prev_acts}\n'
-                f'Note: {self.note}\n')
+                f'Note(s): {self.note}\n'
+                f'Is grouped: {self.grouped}. Is hidden: {self.hidden}.\n')
 
 
 class JobRow:
@@ -212,6 +213,12 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
                 else:
                     prev_est.append(0)
 
+            # this takes care of grouping and hiding previously grouped/hidden jobs
+            if 'g' in job[max_col]:
+                grouped = True
+            if 'h' in job[max_col]:
+                hidden = True
+
         elif idx_mod == 1:  # second row of job. only has actual costs (and maybe notes but thats not processed here)
             lastint = 0
             for col in range(6, max_col):  # actual costs start at 6 on second row of four
@@ -227,7 +234,7 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
 
         elif idx_mod == 3:  # this is the last row of a job, so all info will be known
             orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden))
-            # print(str(Job(jnum, desc, pm, est, act, prev_est, prev_act, note)))
+            print(str(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden)))
 
         else:  # only the third line. no new info here
             pass
