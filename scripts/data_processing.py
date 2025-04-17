@@ -43,9 +43,12 @@ class Job:
     act: int
     prev_ests: list[int] = []
     prev_acts: list[int] = []
+    note: list[(int, str)]
+    grouped: bool = False
+    hidden: bool = False
 
-    def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int,
-                 prev_ests: list[int], prev_acts: list[int]):
+    def __init__(self, jnum: int, desc: string, pm: string, est: int, act: int, prev_ests: list[int],
+                 prev_acts: list[int], note: list[(int, str)], grouped: bool, hidden: bool):
         self.jnum = jnum
         self.desc = desc
         self.pm = pm
@@ -53,12 +56,17 @@ class Job:
         self.act = act
         self.prev_ests = prev_ests
         self.prev_acts = prev_acts
+        self.note = note
+        self.grouped = grouped
+        self.hidden = hidden
 
     def __str__(self):
         return (f'Job Number: {self.jnum}, Project Manager: {self.pm}, Description: {self.desc}\n'
                 f'Estimated Cost: {self.est}, Actual Cost: {self.act}\n'
                 f'Previous Estimates: {self.prev_ests}\n'
-                f'Previous Actuals: {self.prev_acts}\n')
+                f'Previous Actuals: {self.prev_acts}\n'
+                f'Note(s): {self.note}\n'
+                f'Is grouped: {self.grouped}. Is hidden: {self.hidden}.\n')
 
 
 class JobRow:
@@ -148,7 +156,7 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 
         if jnum != 'DEFAULT' and desc != 'DEFAULT' and pm != 'DEFAULT' and est != 99999999 and act != 99999999:
             # add job to list and reset variables
-            jobs.append(Job(jnum, desc, pm, est, act, prev_ests=[], prev_acts=[]))
+            jobs.append(Job(jnum, desc, pm, est, act, prev_ests=[], prev_acts=[], note=[None, None], grouped=False, hidden=False))
 
             jnum = 99999999
             desc = 'DEFAULT'
@@ -158,19 +166,31 @@ def create_jobs_from_raw(data: list[string], num_jobs: int):
 
     # reports if there's a discrepancy found so the data can be reviewed
     if len(jobs) != num_jobs:
-        print(f'Though {num_jobs} were found, {len(jobs)} were actually reported. You may want to check your data.')
-
+        # print(f'Though {num_jobs} were found, {len(jobs)} were actually reported. You may want to check your data.')
+        pass
     return jobs
 
 
 def create_jobs_from_excel_in(data: list[string], max_col: int):
     orig_job_list_excel: list[Job] = []
     est, act = 0, 0
+    note: list[(int, str)] = [None, None]
+    grouped = False
+    hidden = False
 
     for index, job in enumerate(data):
-        idx_mod = index % 4
+        idx_mod = index % 4  # finds what row of the job it is
 
-        if idx_mod == 0:
+        # note stuff and group states
+        if idx_mod == 0:  # reset list of notes/state of group at beginning of job
+            note = [None, None]
+            grouped = False
+            hidden = False
+        if job[max_col - 1] is not None:
+            note.append((idx_mod, job[max_col - 1]))
+
+        # adds data to job according to what job row it is
+        if idx_mod == 0:  # first row of job. has most of the info
             jnum = None
             if job[0] is not None:
                 jnum = int(str(job[0]).replace('-', ''))
@@ -182,23 +202,42 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
             prev_act: list[int] = []
 
             lastint = 0
-            for col in range(6, max_col):  # estimated costs start at 6 on line 0
-                if isinstance(job[col], int):
+            for col in range(6, max_col):  # estimated costs start at 6 on first row of four
+                if isinstance(job[col], int) and job[col] != 0:
                     prev_est.append(job[col])
                     lastint = job[col]
-                elif isinstance(job[col], str):
+                elif col == max_col - 1:  # this is the notes row, should break to allow note to be copied
+                    break
+                elif isinstance(job[col], str) or job[col] == 0 or job[col] is None:
                     prev_est.append(lastint)
                 else:
                     prev_est.append(0)
 
-        elif idx_mod == 1:
-            for col in range(6, max_col):  # estimated costs start at 6 on line 0
-                if isinstance(job[col], int):
+            # this takes care of grouping and hiding previously grouped/hidden jobs
+            if 'g' in job[max_col]:
+                grouped = True
+            if 'h' in job[max_col]:
+                hidden = True
+
+        elif idx_mod == 1:  # second row of job. only has actual costs (and maybe notes but thats not processed here)
+            lastint = 0
+            for col in range(6, max_col):  # actual costs start at 6 on second row of four
+                if isinstance(job[col], int) and job[col] != 0:
                     prev_act.append(job[col])
+                    lastint = job[col]
+                elif col == max_col - 1:  # this is the notes row, should break to allow note to be copied
+                    break
+                elif job[col] == 0 or job[col] is None:
+                    prev_act.append(lastint)
                 else:
                     prev_act.append(0)
 
-            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act))
+        elif idx_mod == 3:  # this is the last row of a job, so all info will be known
+            orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden))
+            # print(str(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden)))
+
+        else:  # only the third line. no new info here
+            pass
 
     return orig_job_list_excel
 
@@ -221,7 +260,8 @@ def compare_jobs(new_jobs: list[Job], old_jobs: list[Job]):  # this assumes both
             new_idx += 1
         else:
             combined_list.append(Job(new_jobs[new_idx].jnum, new_jobs[new_idx].desc, new_jobs[new_idx].pm, new_jobs[new_idx].est,
-                                     new_jobs[new_idx].act, old_jobs[old_idx].prev_ests, old_jobs[old_idx].prev_acts))
+                                     new_jobs[new_idx].act, old_jobs[old_idx].prev_ests, old_jobs[old_idx].prev_acts,
+                                     old_jobs[old_idx].note, old_jobs[old_idx].grouped, old_jobs[old_idx].hidden))
             new_idx += 1
             old_idx += 1
 
@@ -236,36 +276,49 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
         for i in range(0, 4):
             match i:
                 case 0:  # first row of four, should have all info but actual costs
+
                     jnum_formatted = str(job.jnum)
                     jnum_formatted = jnum_formatted[:2] + '-' + jnum_formatted[2:4] + '-' + jnum_formatted[4:]
 
                     row = [jnum_formatted, f'=A{index}', job.desc, job.pm, f'=D{index}', 'Estimate']
 
                     col_filled = 6
+                    current_prev = 0
 
                     for est in job.prev_ests:
                         row.append(est)
+                        current_prev = est
                         col_filled += 1
 
+                    # really shouldnt execute :P leaving it in just in case though
                     while (max_col - col_filled) > 0:
                         row.append('')
                         col_filled += 1
 
-                    row.append(job.est)
+                    if job.est != 0:
+                        row.append(job.est)
+                    else:
+                        row.append(current_prev)
 
                 case 1:  # second row, should have actual costs and formulas
                     row = ['', f'=A{index - 1}', '', '', f'=D{index - 1}', 'Actual']
 
                     col_filled = 6
+                    current_prev = 0
+
                     for act in job.prev_acts:
                         row.append(act)
                         col_filled += 1
+                        current_prev = act
 
                     while (max_col - col_filled) > 0:
                         row.append('')
                         col_filled += 1
 
-                    row.append(job.act)
+                    if job.act != 0:
+                        row.append(job.act)
+                    else:
+                        row.append(current_prev)
 
                 case 2:  # third row, should be almost all formulas
                     row = ['', f'=A{index - 2}', '', '', f'=D{index - 2}', 'Last Week']
@@ -282,7 +335,6 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                             first_cell_letter = str(first_cell_letter).replace('[\'', '').replace('\']', '')
                             second_cell_letter = str(second_cell_letter).replace('[\'', '').replace('\']', '')
 
-                            # row.append(f'={first_cell_letter}{index - 1}-{second_cell_letter}{index - 1}')
                             row.append(f'=IF(AND(ISNUMBER({first_cell_letter}{index-1}),ISNUMBER({second_cell_letter}{index-1})), '
                                        f'{first_cell_letter}{index-1}-{second_cell_letter}{index-1}, 0)')
 
@@ -297,6 +349,16 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
 
                 case _:  # default case. it iterates through 0, 1, 2, and 3 so its literally not possible to get here
                     row = ''
+
+            for nt in job.note:
+                if nt is not None and nt[0] == i:  # skip defaults
+                    # print(nt[1])
+                    row.append(nt[1])
+
+            if job.grouped is True:
+                row.append(f'Grouped={job.grouped}')
+            if job.hidden is True:
+                row.append(f'Hidden={job.hidden}')
 
             index += 1
             formatted_job_list.append(row)

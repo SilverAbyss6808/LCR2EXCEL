@@ -3,6 +3,7 @@
 
 
 import file_rw as frw
+import eel
 
 
 def add_pdf_data_to_existing_spreadsheet(input_pdf_path, input_excel_path, output_excel_path):

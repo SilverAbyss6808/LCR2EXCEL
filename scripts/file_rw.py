@@ -74,10 +74,22 @@ def read_excel(input_excel_path: string):
 
     rows: list = list(active_sheet.iter_rows(min_row=2, values_only=True))
     num_rows = active_sheet.max_row - 1
-    num_jobs: int = int(num_rows / 4)  # number of lines minus title line, divided by four lines per job
 
     for i in range(0, num_rows):  # i is the index jsyk
+        row_num = i + 2
+
         current_row = (rows[i])
+        dim_data = ()
+        add_to_dd = ''
+
+        if active_sheet.row_dimensions[row_num].outlineLevel > 0:  # these are rows that are grouped together
+            add_to_dd += 'g'
+
+        if active_sheet.row_dimensions[row_num].hidden:  # rows that are hidden
+            add_to_dd += 'h'
+
+        dim_data += (add_to_dd,)
+        current_row = current_row + dim_data
         excel_jobs.append(current_row)
 
     excel_jobs = dp.create_jobs_from_excel_in(excel_jobs, active_sheet.max_column)
@@ -98,22 +110,43 @@ def create_write_new_excel(new: list[dp.Job], old: list[dp.Job], old_path: strin
 
         for cell in tr_gen:
             for val in cell:
-                title_row.append(val)
+                if val != 'Notes':
+                    title_row.append(val)
+
     else:
         job_list = new
         max_col = 6
         title_row = ['Column1', 'Job No', 'Description', 'Column2', 'PM', 'Column5']
 
-    formatted_job_list = dp.format_jobs_as_excel(job_list, max_col)
+    formatted_job_list = dp.format_jobs_as_excel(job_list, max_col - 1)
 
     new_file = opxl.Workbook()
     sheet = new_file.active
 
     title_row.append(dp.pdf_date)
+    title_row.append('Notes')
     sheet.append(title_row)
 
-    for row in formatted_job_list:
-        sheet.append(row)
+    for row_num, row in enumerate(formatted_job_list, 1):
+
+        # keep track of if rows are grouped/hidden
+        gp = False
+        hd = False
+
+        current_mod = (row_num - 1) % 4  # keeps track of first, second, third, fourth row of job
+
+        # take any grouped/hidden statements out and act on them
+        if 'Grouped=True' in row:
+            gp = True
+            row.remove('Grouped=True')
+        if 'Hidden=True' in row:
+            hd = True
+            row.remove('Hidden=True')
+
+        sheet.append(row)  # append cleaned up row
+
+        if current_mod == 3 and gp is True:  # if last row of job, group/hide as needed
+            sheet.row_dimensions.group(row_num - 2, row_num + 1, hidden=hd)
 
     # todo: append end stuff
 
