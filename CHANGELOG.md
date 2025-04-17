@@ -7,3 +7,4 @@
 ## v0.3
 * Fills cells previous estimates/actual costs rather than zeroes on the weeks where no work is done
 * Added ability for notes to be carried over between sheets
+* Maintains groups and whether or not they're hidden between sheets

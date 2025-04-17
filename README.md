@@ -1,4 +1,4 @@
-# LCR2EXCEL v0.2
+# LCR2EXCEL v0.3
 ## Add your Labor Cost Report to your cost-tracking spreadsheet quickly and easily!
 
 ### To install:

@@ -14,7 +14,7 @@ output_excel_path: string  # path to output spreadsheet: should be in the same d
 
 print(
     f'###############################################\n'
-    f'########## WELCOME TO LCR2EXCEL v0.2 ##########\n'
+    f'########## WELCOME TO LCR2EXCEL v0.3 ##########\n'
     f'###############################################'
 )
 

@@ -234,7 +234,7 @@ def create_jobs_from_excel_in(data: list[string], max_col: int):
 
         elif idx_mod == 3:  # this is the last row of a job, so all info will be known
             orig_job_list_excel.append(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden))
-            print(str(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden)))
+            # print(str(Job(jnum, desc, pm, est, act, prev_est, prev_act, note, grouped, hidden)))
 
         else:  # only the third line. no new info here
             pass
@@ -354,6 +354,11 @@ def format_jobs_as_excel(list_to_format: list[Job], max_col: int):
                 if nt is not None and nt[0] == i:  # skip defaults
                     # print(nt[1])
                     row.append(nt[1])
+
+            if job.grouped is True:
+                row.append(f'Grouped={job.grouped}')
+            if job.hidden is True:
+                row.append(f'Hidden={job.hidden}')
 
             index += 1
             formatted_job_list.append(row)
