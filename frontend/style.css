@@ -1,0 +1,99 @@
+
+/* putting this up here to keep definitions organized */
+:root {
+    /* colors - see palette.png. used coolors.co */
+    --light2: FFFFFF;
+    --light1: FFCDBC;
+    --base: F93943;
+    --dark1: 2D080A;
+    --dark2: 130303;
+}
+
+
+/* elements */
+html {
+    background-color: var(--light1);
+    color: var(--dark1);
+    font-family: "Bahnschrift";
+    font-size: 1.5em;
+}
+body {
+    margin: 0;
+}
+select {
+    width: 50%;
+    min-width: 400px;
+    margin: auto;
+    padding: 8px;
+
+    background-color: var(--light2);
+    border: none;
+    border-bottom: 2px solid;
+    border-radius: 10px;
+
+    font-size: 0.75em;
+    cursor: pointer;
+}
+button {
+
+}
+input[type=file] {
+    display: none;
+}
+
+
+/* pseudoclasses */
+
+
+/* ids */
+#navbar {
+    background-color: var(--dark1);
+    color: var(--light2);
+    padding: 2px 0;
+    font-size: 2em;
+    margin: 0;
+    margin-bottom: 30px;
+}
+#gobutton {
+    width: 100px;
+    height: 40px;
+    margin: 10px;
+
+    border-radius: 10px;
+    background-color: var(--dark1);
+    color: var(--light2);
+    cursor: pointer;
+}
+
+
+/* classes */
+.navelement {
+    margin: 2%;
+}
+.ddelement {
+
+}
+.pageelement {
+    margin: 10px;
+}
+.fileinput {
+    border: 2px dashed black;
+    border-radius: 10px;
+
+    height: 110px;
+    width: 100px;
+}
+.labelimg {
+    cursor: pointer;
+}
+.flexgroup {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 20px;
+}
+.flexitem {
+    width: 100px;
+    font-size: 0.75em;
+    text-align: center;
+}

@@ -1,11 +1,63 @@
-<html>
+<html lang="en">
     <head>
         <title>LCR2EXCEL</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="icon" href="assets/lcr2excel.png">
     </head>
 
     <script type="text/javascript" src="/eel.js"></script>
 
     <body>
-        <h1>Hi</h1>
+
+        <div id="navbar">
+            <nav>
+                <p class="navelement">LCR2EXCEL</p>
+            </nav>
+        </div>
+
+        <div class="pageelement">
+            <h3>Choose an operation...</h3>
+
+            <label for="actiondd"></label>
+            <select name="action" id="actiondd">
+                <option value="lcr-xl" class="ddelement">Labor Cost Report PDF -> Excel Spreadsheet</option>
+            </select>
+        </div>
+
+        <br>
+
+        <div class="pageelement">
+            <h3>Select inputs...</h3>
+
+            <div class="flexgroup">
+                <div class="flexitem">
+                    <div class="fileinput">
+                        <label for="file1in" class="labelimg"><img src="assets/plusup.png" alt="plus sign"></label>
+                        <input type="file" id="file1in" multiple accept=".pdf">
+                    </div>
+                    <p>Labor Cost Report PDF(s)</p>
+                </div>
+
+                <div class="flexitem">
+                    <div class="fileinput">
+                        <label for="file2in" class="labelimg"><img src="assets/plusup.png" alt="plus sign"></label>
+                        <input type="file" id="file2in" accept=".xls, .xlsx">
+                    </div>
+                    <p>Existing Excel Spreadsheet</p>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <div class="pageelement">
+            <h3>Review output...</h3>
+            <label for="outpathfield">Proposed output file path: </label>
+            <input type="text" id="outpathfield" value="hi">
+        </div>
+
+        <button
+                type="submit" value="go" id="gobutton">Process</button>
+
     </body>
 </html>
